@@ -8,6 +8,8 @@ using System.Linq;
 public class CustomTerrain : MonoBehaviour {
 
 	public Vector2 randomHeightRange = new Vector2(0, 0.1f);
+	public Texture2D heightMapImage;
+	public Vector3 heightMapScale = new Vector3(1, 1, 1);
 	public Terrain terrain;
 	public TerrainData terrainData;
 
@@ -16,12 +18,26 @@ public class CustomTerrain : MonoBehaviour {
 		float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
 		for (int x = 0; x < terrainData.heightmapWidth; x++)
 		{
-			for (int y = 0; y < terrainData.heightmapHeight; y++)
+			for (int z = 0; z < terrainData.heightmapHeight; z++)
 			{
-				heightMap[x, y] += UnityEngine.Random.Range(randomHeightRange.x, randomHeightRange.y);
+				heightMap[x, z] += UnityEngine.Random.Range(randomHeightRange[0], randomHeightRange[1]);
 			}
 			terrainData.SetHeights(0, 0, heightMap);
 		}
+	}
+
+	public void LoadTexture()
+	{
+		float[,] heightMap = new float[terrainData.heightmapWidth, terrainData.heightmapHeight];
+
+		for (int x = 0; x < terrainData.heightmapWidth; x++)
+		{
+			for (int z = 0; z < terrainData.heightmapHeight; z++)
+			{
+				heightMap[x, z] = heightMapImage.GetPixel((int)(x * heightMapScale.x), (int)(z * heightMapScale.z)).grayscale * heightMapScale.y;
+			}
+		}
+		terrainData.SetHeights(0, 0, heightMap);
 	}
 
 	public void ResetTerrain()
@@ -29,9 +45,9 @@ public class CustomTerrain : MonoBehaviour {
 		float[,] heightMap = new float[terrainData.heightmapWidth, terrainData.heightmapHeight];
 		for (int x = 0; x < terrainData.heightmapWidth; x++)
 		{
-			for (int y = 0; y < terrainData.heightmapHeight; y++)
+			for (int z = 0; z < terrainData.heightmapHeight; z++)
 			{
-				heightMap[x,y] = 0;
+				heightMap[x, z] = 0;
 			}
 		}
 		terrainData.SetHeights(0, 0, heightMap);
