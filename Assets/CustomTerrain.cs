@@ -10,17 +10,41 @@ public class CustomTerrain : MonoBehaviour {
 	public Vector2 randomHeightRange = new Vector2(0, 0.1f);
 	public Texture2D heightMapImage;
 	public Vector3 heightMapScale = new Vector3(1, 1, 1);
+
+	// PERLIN NOISE --------------
+	// TODO: why are these separate floats when the other scale and range variables use Vector2/3?
+	public float perlinXScale = 0.01f;
+	public float perlinYScale = 0.01f;
+	public int perlinOffsetX = 0;
+	public int perlinOffsetY = 0;
+
 	public Terrain terrain;
 	public TerrainData terrainData;
+
+	public void Perlin()
+	{
+		float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
+		for (int x = 0; x < terrainData.heightmapWidth; x++)
+		{
+			for (int y = 0; y < terrainData.heightmapHeight; y++)
+			{
+				heightMap[x, y] += Mathf.PerlinNoise(
+					(x + perlinOffsetX) * perlinXScale,
+					(y + perlinOffsetY) * perlinYScale
+				);
+			}
+			terrainData.SetHeights(0, 0, heightMap);
+		}
+	}
 
 	public void RandomTerrain()
 	{
 		float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
 		for (int x = 0; x < terrainData.heightmapWidth; x++)
 		{
-			for (int z = 0; z < terrainData.heightmapHeight; z++)
+			for (int y = 0; y < terrainData.heightmapHeight; y++)
 			{
-				heightMap[x, z] += UnityEngine.Random.Range(randomHeightRange[0], randomHeightRange[1]);
+				heightMap[x, y] += UnityEngine.Random.Range(randomHeightRange[0], randomHeightRange[1]);
 			}
 			terrainData.SetHeights(0, 0, heightMap);
 		}
@@ -32,9 +56,12 @@ public class CustomTerrain : MonoBehaviour {
 
 		for (int x = 0; x < terrainData.heightmapWidth; x++)
 		{
-			for (int z = 0; z < terrainData.heightmapHeight; z++)
+			for (int y = 0; y < terrainData.heightmapHeight; y++)
 			{
-				heightMap[x, z] = heightMapImage.GetPixel((int)(x * heightMapScale.x), (int)(z * heightMapScale.z)).grayscale * heightMapScale.y;
+				heightMap[x, y] = heightMapImage.GetPixel(
+					(int)(x * heightMapScale.x),
+					(int)(y * heightMapScale.z)
+				).grayscale * heightMapScale.y;
 			}
 		}
 		terrainData.SetHeights(0, 0, heightMap);
@@ -45,9 +72,9 @@ public class CustomTerrain : MonoBehaviour {
 		float[,] heightMap = new float[terrainData.heightmapWidth, terrainData.heightmapHeight];
 		for (int x = 0; x < terrainData.heightmapWidth; x++)
 		{
-			for (int z = 0; z < terrainData.heightmapHeight; z++)
+			for (int y = 0; y < terrainData.heightmapHeight; y++)
 			{
-				heightMap[x, z] = 0;
+				heightMap[x, y] = 0;
 			}
 		}
 		terrainData.SetHeights(0, 0, heightMap);
@@ -81,7 +108,7 @@ public class CustomTerrain : MonoBehaviour {
 		bool found = false;
 
 		// ensure the tag doesn't already exist
-		for (int i = 0; i< tagsProp.arraySize; i++)
+		for (int i = 0; i < tagsProp.arraySize; i++)
 		{
 			SerializedProperty t = tagsProp.GetArrayElementAtIndex(i);
 			if (t.stringValue.Equals(newTag)) { found = true; break;}
@@ -94,15 +121,5 @@ public class CustomTerrain : MonoBehaviour {
 			SerializedProperty newTagProp = tagsProp.GetArrayElementAtIndex(0);
 			newTagProp.stringValue = newTag;
 		}
-	}
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
 	}
 }
