@@ -14,6 +14,10 @@ public class CustomTerrainEditor : Editor {
 	SerializedProperty perlinYScale;
 	SerializedProperty perlinOffsetX;
 	SerializedProperty perlinOffsetY;
+	SerializedProperty perlinOctaves;
+	SerializedProperty perlinPersistence;
+	SerializedProperty perlinFrequencyMultiplier;
+	SerializedProperty perlinHeightScale;
 
 
 	// fold outs ----------------------
@@ -30,6 +34,10 @@ public class CustomTerrainEditor : Editor {
 		perlinYScale = serializedObject.FindProperty("perlinYScale");
 		perlinOffsetX = serializedObject.FindProperty("perlinOffsetX");
 		perlinOffsetY = serializedObject.FindProperty("perlinOffsetY");
+		perlinOctaves = serializedObject.FindProperty("perlinOctaves");
+		perlinPersistence = serializedObject.FindProperty("perlinPersistence");
+		perlinFrequencyMultiplier = serializedObject.FindProperty("perlinFrequencyMultiplier");
+		perlinHeightScale = serializedObject.FindProperty("perlinHeightScale");
 	}
 
 	public override void OnInspectorGUI()
@@ -68,10 +76,14 @@ public class CustomTerrainEditor : Editor {
 		{
 			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 			GUILayout.Label("Set Heights with Perlin Noise", EditorStyles.boldLabel);
-			EditorGUILayout.Slider(perlinXScale, 0, 0.1f, new GUIContent("X Scale"));
-			EditorGUILayout.Slider(perlinYScale, 0, 0.1f, new GUIContent("Y Scale"));
+			EditorGUILayout.Slider(perlinXScale, 0, 1, new GUIContent("X Scale"));
+			EditorGUILayout.Slider(perlinYScale, 0, 1, new GUIContent("Y Scale"));
 			EditorGUILayout.IntSlider(perlinOffsetX, 0, 10000, new GUIContent("X Offset"));
 			EditorGUILayout.IntSlider(perlinOffsetY, 0, 10000, new GUIContent("Y Offset"));
+			EditorGUILayout.IntSlider(perlinOctaves, 1, 10, new GUIContent("Octaves"));
+			EditorGUILayout.Slider(perlinPersistence, 0.1f, 10, new GUIContent("Persistence"));
+			EditorGUILayout.Slider(perlinFrequencyMultiplier, 2, 10, new GUIContent("Frequency Multiplier"));
+			EditorGUILayout.Slider(perlinHeightScale, 0, 1, new GUIContent("Height Scale"));
 			if (GUILayout.Button("Perlin Noise"))
 			{
 				terrain.Perlin();

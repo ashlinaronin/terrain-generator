@@ -18,6 +18,11 @@ public class CustomTerrain : MonoBehaviour {
 	public int perlinOffsetX = 0;
 	public int perlinOffsetY = 0;
 
+	public int perlinOctaves = 3;
+	public float perlinPersistence = 8;
+	public float perlinHeightScale = 0.09f;
+	public float perlinFrequencyMultiplier = 2;
+
 	public Terrain terrain;
 	public TerrainData terrainData;
 
@@ -28,9 +33,12 @@ public class CustomTerrain : MonoBehaviour {
 		{
 			for (int y = 0; y < terrainData.heightmapHeight; y++)
 			{
-				heightMap[x, y] += Mathf.PerlinNoise(
+				heightMap[x, y] += Utils.fractalBrownianMotion(
 					(x + perlinOffsetX) * perlinXScale,
-					(y + perlinOffsetY) * perlinYScale
+					(y + perlinOffsetY) * perlinYScale,
+					perlinOctaves,
+					perlinPersistence,
+					perlinFrequencyMultiplier
 				);
 			}
 			terrainData.SetHeights(0, 0, heightMap);
