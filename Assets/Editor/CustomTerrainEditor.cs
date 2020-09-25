@@ -18,6 +18,7 @@ public class CustomTerrainEditor : Editor {
 	SerializedProperty perlinPersistence;
 	SerializedProperty perlinFrequencyMultiplier;
 	SerializedProperty perlinHeightScale;
+	SerializedProperty resetTerrain;
 
 
 	// fold outs ----------------------
@@ -38,6 +39,7 @@ public class CustomTerrainEditor : Editor {
 		perlinPersistence = serializedObject.FindProperty("perlinPersistence");
 		perlinFrequencyMultiplier = serializedObject.FindProperty("perlinFrequencyMultiplier");
 		perlinHeightScale = serializedObject.FindProperty("perlinHeightScale");
+		resetTerrain = serializedObject.FindProperty("resetTerrain");
 	}
 
 	public override void OnInspectorGUI()
@@ -45,6 +47,8 @@ public class CustomTerrainEditor : Editor {
 		serializedObject.Update();
 
 		CustomTerrain terrain = (CustomTerrain)target;
+
+		EditorGUILayout.PropertyField(resetTerrain);
 
 		showRandom = EditorGUILayout.Foldout(showRandom, "Random");
 		if (showRandom)

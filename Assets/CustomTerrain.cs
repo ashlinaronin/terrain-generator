@@ -11,6 +11,8 @@ public class CustomTerrain : MonoBehaviour {
 	public Texture2D heightMapImage;
 	public Vector3 heightMapScale = new Vector3(1, 1, 1);
 
+	public bool resetTerrain = true;
+
 	// PERLIN NOISE --------------
 	// TODO: why are these separate floats when the other scale and range variables use Vector2/3?
 	public float perlinXScale = 0.01f;
@@ -26,9 +28,18 @@ public class CustomTerrain : MonoBehaviour {
 	public Terrain terrain;
 	public TerrainData terrainData;
 
+	float[,] GetHeightMap()
+	{
+		if (resetTerrain) {
+			return new float[terrainData.heightmapWidth, terrainData.heightmapHeight];
+		} else {
+			return terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
+		}
+	}
+
 	public void Perlin()
 	{
-		float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
+		float[,] heightMap = GetHeightMap();
 		for (int x = 0; x < terrainData.heightmapWidth; x++)
 		{
 			for (int y = 0; y < terrainData.heightmapHeight; y++)
@@ -47,7 +58,7 @@ public class CustomTerrain : MonoBehaviour {
 
 	public void RandomTerrain()
 	{
-		float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
+		float[,] heightMap = GetHeightMap();
 		for (int x = 0; x < terrainData.heightmapWidth; x++)
 		{
 			for (int y = 0; y < terrainData.heightmapHeight; y++)
@@ -60,13 +71,13 @@ public class CustomTerrain : MonoBehaviour {
 
 	public void LoadTexture()
 	{
-		float[,] heightMap = new float[terrainData.heightmapWidth, terrainData.heightmapHeight];
+		float[,] heightMap = GetHeightMap();
 
 		for (int x = 0; x < terrainData.heightmapWidth; x++)
 		{
 			for (int y = 0; y < terrainData.heightmapHeight; y++)
 			{
-				heightMap[x, y] = heightMapImage.GetPixel(
+				heightMap[x, y] += heightMapImage.GetPixel(
 					(int)(x * heightMapScale.x),
 					(int)(y * heightMapScale.z)
 				).grayscale * heightMapScale.y;
