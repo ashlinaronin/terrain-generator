@@ -20,11 +20,15 @@ public class CustomTerrainEditor : Editor {
 	SerializedProperty perlinHeightScale;
 	SerializedProperty resetTerrain;
 
+	GUITableState perlinParameterTable;
+	SerializedProperty perlinParameters;
+
 
 	// fold outs ----------------------
 	bool showRandom = false;
 	bool showLoadHeights = false;
 	bool showPerlin = false;
+	bool showMultiplePerlin = false;
 
 	void OnEnable()
 	{
@@ -40,6 +44,8 @@ public class CustomTerrainEditor : Editor {
 		perlinFrequencyMultiplier = serializedObject.FindProperty("perlinFrequencyMultiplier");
 		perlinHeightScale = serializedObject.FindProperty("perlinHeightScale");
 		resetTerrain = serializedObject.FindProperty("resetTerrain");
+		perlinParameterTable = new GUITableState("perlinParametersTable");
+		perlinParameters = serializedObject.FindProperty("perlinParameters");
 	}
 
 	public override void OnInspectorGUI()
@@ -91,6 +97,31 @@ public class CustomTerrainEditor : Editor {
 			if (GUILayout.Button("Perlin Noise"))
 			{
 				terrain.Perlin();
+			}
+		}
+
+		showMultiplePerlin = EditorGUILayout.Foldout(showMultiplePerlin, "Multiple Perlin Noise");
+		if (showMultiplePerlin)
+		{
+			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+			GUILayout.Label("Multiple Perlin Noise", EditorStyles.boldLabel);
+			perlinParameterTable = GUITableLayout.DrawTable(perlinParameterTable, perlinParameters);
+			
+			GUILayout.Space(20);
+
+			EditorGUILayout.BeginHorizontal();
+			if (GUILayout.Button("+"))
+			{
+				terrain.AddNewPerlin();
+			}
+			if (GUILayout.Button("-"))
+			{
+				terrain.RemovePerlin();
+			}
+			EditorGUILayout.EndHorizontal();
+			if (GUILayout.Button("Apply Multiple Perlin"))
+			{
+				terrain.MultiplePerlin();
 			}
 		}
 
