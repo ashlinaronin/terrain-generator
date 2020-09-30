@@ -8,6 +8,7 @@ public class CustomTerrainEditor : Editor {
 
 	// properties ---------------------
 	SerializedProperty randomHeightRange;
+	SerializedProperty voronoiHeightRange;
 	SerializedProperty heightMapScale;
 	SerializedProperty heightMapImage;
 	SerializedProperty perlinXScale;
@@ -29,10 +30,12 @@ public class CustomTerrainEditor : Editor {
 	bool showLoadHeights = false;
 	bool showPerlin = false;
 	bool showMultiplePerlin = false;
+	bool showVoronoi = false;
 
 	void OnEnable()
 	{
 		randomHeightRange = serializedObject.FindProperty("randomHeightRange");
+		voronoiHeightRange = serializedObject.FindProperty("voronoiHeightRange");
 		heightMapScale = serializedObject.FindProperty("heightMapScale");
 		heightMapImage = serializedObject.FindProperty("heightMapImage");
 		perlinXScale = serializedObject.FindProperty("perlinXScale");
@@ -125,6 +128,18 @@ public class CustomTerrainEditor : Editor {
 			}
 		}
 
+		showVoronoi = EditorGUILayout.Foldout(showVoronoi, "Voronoi");
+		if (showVoronoi)
+		{
+			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+			GUILayout.Label("Set Height Range", EditorStyles.boldLabel);
+			EditorGUILayout.PropertyField(randomHeightRange);
+			if (GUILayout.Button("Voronoi"))
+			{
+				terrain.Voronoi();
+			}
+		}
+
 		EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 		if (GUILayout.Button("Reset Terrain"))
 		{
@@ -132,15 +147,5 @@ public class CustomTerrainEditor : Editor {
 		}
 
 		serializedObject.ApplyModifiedProperties();
-	}
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
 	}
 }

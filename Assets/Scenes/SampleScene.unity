@@ -335,6 +335,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   randomHeightRange: {x: 0, y: 0.1}
+  voronoiHeightRange: {x: 0, y: 1}
   heightMapImage: {fileID: 2800000, guid: 6041c42ee7e5a4ac1ba55ecb97c7b11f, type: 3}
   heightMapScale: {x: 4, y: 1, z: 4}
   resetTerrain: 1

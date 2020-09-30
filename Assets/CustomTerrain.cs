@@ -8,6 +8,8 @@ using System.Linq;
 public class CustomTerrain : MonoBehaviour {
 
 	public Vector2 randomHeightRange = new Vector2(0, 0.1f);
+
+	public Vector2 voronoiHeightRange = new Vector2(0f, 1.0f);
 	public Texture2D heightMapImage;
 	public Vector3 heightMapScale = new Vector3(1, 1, 1);
 
@@ -52,6 +54,36 @@ public class CustomTerrain : MonoBehaviour {
 		} else {
 			return terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
 		}
+	}
+
+	public void Voronoi()
+	{
+		float[,] heightMap = GetHeightMap();
+		float falloff = 2.0f;
+		Vector2Int peakLocation = new Vector2Int(
+			UnityEngine.Random.Range(0, terrainData.heightmapWidth),
+			UnityEngine.Random.Range(0, terrainData.heightmapHeight)
+		);
+		float peakHeight = UnityEngine.Random.Range(voronoiHeightRange[0], voronoiHeightRange[1]);;
+		heightMap[peakLocation.x, peakLocation.y] += peakHeight;
+
+		float maxDistance = Vector2.Distance(new Vector2Int(0, 0), new Vector2Int(terrainData.heightmapWidth, terrainData.heightmapHeight));
+
+		for (int x = 0; x < terrainData.heightmapWidth; x++)
+		{
+			for (int y = 0; y < terrainData.heightmapHeight; y++)
+			{
+				Vector2Int currentLocation = new Vector2Int(x, y);
+
+				// don't process if we're at the peak location
+				if (peakLocation.Equals(currentLocation)) break;
+
+				float distanceToPeak = Vector2.Distance(peakLocation, currentLocation) * falloff;
+				heightMap[x, y] = peakHeight - (distanceToPeak / maxDistance);
+			}
+		}
+
+		terrainData.SetHeights(0, 0, heightMap);
 	}
 
 	public void Perlin()
