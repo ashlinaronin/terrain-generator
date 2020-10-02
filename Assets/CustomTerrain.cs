@@ -58,13 +58,18 @@ public class CustomTerrain : MonoBehaviour {
 
 	public void Voronoi()
 	{
+		// note: randomness disabled for testing purposes
 		float[,] heightMap = GetHeightMap();
-		float falloff = 2.0f;
+		float fallOff = 2.0f;
+		float dropOff = 0.6f;
 		Vector2Int peakLocation = new Vector2Int(
-			UnityEngine.Random.Range(0, terrainData.heightmapWidth),
-			UnityEngine.Random.Range(0, terrainData.heightmapHeight)
+			terrainData.heightmapWidth / 2,
+			terrainData.heightmapHeight / 2
+			// UnityEngine.Random.Range(0, terrainData.heightmapWidth),
+			// UnityEngine.Random.Range(0, terrainData.heightmapHeight)
 		);
-		float peakHeight = UnityEngine.Random.Range(voronoiHeightRange[0], voronoiHeightRange[1]);;
+		float peakHeight = 0.5f;
+		// float peakHeight = UnityEngine.Random.Range(voronoiHeightRange[0], voronoiHeightRange[1]);;
 		heightMap[peakLocation.x, peakLocation.y] += peakHeight;
 
 		float maxDistance = Vector2.Distance(new Vector2Int(0, 0), new Vector2Int(terrainData.heightmapWidth, terrainData.heightmapHeight));
@@ -78,8 +83,12 @@ public class CustomTerrain : MonoBehaviour {
 				// don't process if we're at the peak location
 				if (peakLocation.Equals(currentLocation)) break;
 
-				float distanceToPeak = Vector2.Distance(peakLocation, currentLocation) * falloff;
-				heightMap[x, y] = peakHeight - (distanceToPeak / maxDistance);
+				float distanceToPeak = Vector2.Distance(peakLocation, currentLocation) / maxDistance;
+				float height = peakHeight - distanceToPeak * fallOff - Mathf.Pow(distanceToPeak, dropOff);
+
+				// sin is fun too
+				// float height = peakHeight - Mathf.Sin(distanceToPeak * 100) * 0.1f;
+				heightMap[x, y] += height;
 			}
 		}
 
