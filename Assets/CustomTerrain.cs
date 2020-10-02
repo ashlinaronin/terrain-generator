@@ -8,8 +8,6 @@ using System.Linq;
 public class CustomTerrain : MonoBehaviour {
 
 	public Vector2 randomHeightRange = new Vector2(0, 0.1f);
-
-	public Vector2 voronoiHeightRange = new Vector2(0f, 1.0f);
 	public Texture2D heightMapImage;
 	public Vector3 heightMapScale = new Vector3(1, 1, 1);
 
@@ -44,6 +42,14 @@ public class CustomTerrain : MonoBehaviour {
 
 	public List<PerlinParameters> perlinParameters = new List<PerlinParameters>() { new PerlinParameters() };
 
+
+	// VORONOI ------------------------
+	public int voronoiPeakCount = 3;
+	public float voronoiFalloff = 0.2f;
+	public float voronoiDropoff = 0.6f;
+	public float voronoiMinHeight = 0.25f;
+	public float voronoiMaxHeight = 0.5f;
+
 	public Terrain terrain;
 	public TerrainData terrainData;
 
@@ -58,18 +64,12 @@ public class CustomTerrain : MonoBehaviour {
 
 	public void Voronoi()
 	{
-		// note: randomness disabled for testing purposes
 		float[,] heightMap = GetHeightMap();
-		float fallOff = 2.0f;
-		float dropOff = 0.6f;
 		Vector2Int peakLocation = new Vector2Int(
-			terrainData.heightmapWidth / 2,
-			terrainData.heightmapHeight / 2
-			// UnityEngine.Random.Range(0, terrainData.heightmapWidth),
-			// UnityEngine.Random.Range(0, terrainData.heightmapHeight)
+			UnityEngine.Random.Range(0, terrainData.heightmapWidth),
+			UnityEngine.Random.Range(0, terrainData.heightmapHeight)
 		);
-		float peakHeight = 0.5f;
-		// float peakHeight = UnityEngine.Random.Range(voronoiHeightRange[0], voronoiHeightRange[1]);;
+		float peakHeight = UnityEngine.Random.Range(voronoiMinHeight, voronoiMaxHeight);;
 		heightMap[peakLocation.x, peakLocation.y] += peakHeight;
 
 		float maxDistance = Vector2.Distance(new Vector2Int(0, 0), new Vector2Int(terrainData.heightmapWidth, terrainData.heightmapHeight));
@@ -84,7 +84,7 @@ public class CustomTerrain : MonoBehaviour {
 				if (peakLocation.Equals(currentLocation)) break;
 
 				float distanceToPeak = Vector2.Distance(peakLocation, currentLocation) / maxDistance;
-				float height = peakHeight - distanceToPeak * fallOff - Mathf.Pow(distanceToPeak, dropOff);
+				float height = peakHeight - distanceToPeak * voronoiFalloff - Mathf.Pow(distanceToPeak, voronoiDropoff);
 
 				// sin is fun too
 				// float height = peakHeight - Mathf.Sin(distanceToPeak * 100) * 0.1f;
