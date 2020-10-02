@@ -143,12 +143,11 @@ public class CustomTerrainEditor : Editor {
 		showVoronoi = EditorGUILayout.Foldout(showVoronoi, "Voronoi");
 		if (showVoronoi)
 		{
-			EditorGUILayout.IntSlider(voronoiPeakCount, 1, 12, new GUIContent("Peak Count"));
-			EditorGUILayout.Slider(voronoiFalloff, 0, 5.0f, new GUIContent("Falloff"));
-			EditorGUILayout.Slider(voronoiDropoff, 0, 5.0f, new GUIContent("Dropoff"));
-			EditorGUILayout.Slider(voronoiMinHeight, 0, 1f, new GUIContent("Min Height"));
-			EditorGUILayout.Slider(voronoiMaxHeight, 0, 1f, new GUIContent("Max Height"));
-
+			EditorGUILayout.IntSlider(voronoiPeakCount, 1, 10, new GUIContent("Peak Count"));
+			EditorGUILayout.Slider(voronoiFalloff, 0, 10, new GUIContent("Falloff"));
+			EditorGUILayout.Slider(voronoiDropoff, 0, 10, new GUIContent("Dropoff"));
+			EditorGUILayout.Slider(voronoiMinHeight, 0, 1, new GUIContent("Min Height"));
+			EditorGUILayout.Slider(voronoiMaxHeight, 0, 1, new GUIContent("Max Height"));
 			if (GUILayout.Button("Voronoi"))
 			{
 				terrain.Voronoi();

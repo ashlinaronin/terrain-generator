@@ -65,12 +65,17 @@ public class CustomTerrain : MonoBehaviour {
 	public void Voronoi()
 	{
 		float[,] heightMap = GetHeightMap();
-		Vector2Int peakLocation = new Vector2Int(
-			UnityEngine.Random.Range(0, terrainData.heightmapWidth),
-			UnityEngine.Random.Range(0, terrainData.heightmapHeight)
-		);
-		float peakHeight = UnityEngine.Random.Range(voronoiMinHeight, voronoiMaxHeight);;
-		heightMap[peakLocation.x, peakLocation.y] += peakHeight;
+		Vector3[] peaks = new Vector3[voronoiPeakCount];
+		
+		for (int i = 0; i < peaks.Count(); i++)
+		{
+			float x = UnityEngine.Random.Range(0, terrainData.heightmapWidth);
+			float y = UnityEngine.Random.Range(0, terrainData.heightmapHeight);
+			float height = UnityEngine.Random.Range(voronoiMinHeight, voronoiMaxHeight);
+
+			peaks[i] = new Vector3(x, y, height);
+			heightMap[(int)x, (int)y] = Mathf.Max(height, heightMap[(int)x, (int)y]);
+		}
 
 		float maxDistance = Vector2.Distance(new Vector2Int(0, 0), new Vector2Int(terrainData.heightmapWidth, terrainData.heightmapHeight));
 
@@ -79,16 +84,18 @@ public class CustomTerrain : MonoBehaviour {
 			for (int y = 0; y < terrainData.heightmapHeight; y++)
 			{
 				Vector2Int currentLocation = new Vector2Int(x, y);
+				foreach (Vector3 peak in peaks)
+				{
+					// don't process if we're at the peak location
+					Vector2Int peakLocation = new Vector2Int((int)peak.x, (int)peak.y);
+					if (peakLocation.Equals(currentLocation)) break;
 
-				// don't process if we're at the peak location
-				if (peakLocation.Equals(currentLocation)) break;
+					float distanceToPeak = Vector2.Distance(peak, currentLocation) / maxDistance;
+					float height = peak.z - (distanceToPeak * voronoiFalloff) - Mathf.Pow(distanceToPeak, voronoiDropoff);
 
-				float distanceToPeak = Vector2.Distance(peakLocation, currentLocation) / maxDistance;
-				float height = peakHeight - distanceToPeak * voronoiFalloff - Mathf.Pow(distanceToPeak, voronoiDropoff);
-
-				// sin is fun too
-				// float height = peakHeight - Mathf.Sin(distanceToPeak * 100) * 0.1f;
-				heightMap[x, y] += height;
+					// set a height to the greater of: 1. the previous height, and 2. what we just calculated
+					heightMap[x, y] = Mathf.Max(height, heightMap[x,y]);
+				}
 			}
 		}
 
