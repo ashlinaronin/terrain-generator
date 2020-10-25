@@ -49,6 +49,8 @@ public class CustomTerrain : MonoBehaviour {
 	public float voronoiDropoff = 0.6f;
 	public float voronoiMinHeight = 0.25f;
 	public float voronoiMaxHeight = 0.5f;
+	public enum VoronoiType { Linear = 0, Power = 1, Combined = 2, SinPow = 3 };
+	public VoronoiType voronoiType = VoronoiType.Linear;
 
 	public Terrain terrain;
 	public TerrainData terrainData;
@@ -91,7 +93,26 @@ public class CustomTerrain : MonoBehaviour {
 					if (peakLocation.Equals(currentLocation)) break;
 
 					float distanceToPeak = Vector2.Distance(peak, currentLocation) / maxDistance;
-					float height = peak.z - (distanceToPeak * voronoiFalloff) - Mathf.Pow(distanceToPeak, voronoiDropoff);
+					float height;
+
+					// use different algorithm depending on voronoiType selected
+					if (voronoiType == VoronoiType.Combined)
+					{
+						height = peak.z - distanceToPeak * voronoiFalloff - Mathf.Pow(distanceToPeak, voronoiDropoff);
+					}
+					else if (voronoiType == VoronoiType.Power)
+					{
+						height = peak.z - Mathf.Pow(distanceToPeak, voronoiDropoff) * voronoiFalloff;
+					}
+					else if (voronoiType == VoronoiType.SinPow)
+					{
+						height = peak.z - Mathf.Pow(distanceToPeak * 3, voronoiFalloff) - Mathf.Sin(distanceToPeak * 2 * Mathf.PI) / voronoiDropoff;
+					}
+					else {
+						// VoronoiType.Linear
+						height = peak.z - distanceToPeak * voronoiFalloff;
+					}
+
 
 					// set a height to the greater of: 1. the previous height, and 2. what we just calculated
 					heightMap[x, y] = Mathf.Max(height, heightMap[x,y]);
@@ -102,6 +123,7 @@ public class CustomTerrain : MonoBehaviour {
 		terrainData.SetHeights(0, 0, heightMap);
 	}
 
+	// todo: missing height scale?
 	public void Perlin()
 	{
 		float[,] heightMap = GetHeightMap();
