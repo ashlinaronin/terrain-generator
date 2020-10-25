@@ -71,27 +71,49 @@ public class CustomTerrain : MonoBehaviour {
 		}
 	}
 
+	private List<Vector2> GetNeighbors(Vector2 position, int width, int height)
+	{
+		List<Vector2> neighbors = new List<Vector2>();
+
+		// all neighbors, from -1 to 1 in x and y
+		for (int x = -1; x < 2; x++)
+		{
+			for (int y = -1; y < 2; y++)
+			{
+				// don't include self in neighbor list
+				if (x == 0 && y == 0) continue;
+
+				Vector2 neighborPosition = new Vector2(
+					Mathf.Clamp(position.x + x, 0, width - 1),
+					Mathf.Clamp(position.y + y, 0, height - 1)
+				);
+
+				if (!neighbors.Contains(neighborPosition)) {
+					neighbors.Add(neighborPosition);
+				}
+			}
+		}
+
+		return neighbors;
+	}
+
 	public void Smooth()
 	{
 		float [,] heightMap = GetHeightMap();
 
-		// start at 1, 1 and go to width-1, height-1 so we always have 8 neighbors
-		for (int x = 1; x < terrainData.heightmapWidth - 1; x++)
+		for (int x = 0; x < terrainData.heightmapWidth; x++)
 		{
-			for (int y = 1; y < terrainData.heightmapHeight - 1; y++)
+			for (int y = 0; y < terrainData.heightmapHeight; y++)
 			{
-				// blurring effect is accomplished by taking the average of the value at 9 points (8 neighbors and self)
-				heightMap[x, y] = (
-					heightMap[x - 1, y + 1] +
-					heightMap[x, y + 1] +
-					heightMap[x + 1, y + 1] +
-					heightMap[x - 1, y] +
-					heightMap[x, y] +
-					heightMap[x + 1, y] +
-					heightMap[x - 1, y - 1] +
-					heightMap[x, y - 1] + 
-					heightMap[x + 1, y - 1]
-				) / 9.0f;
+				float averageHeight = heightMap[x, y];
+				List<Vector2> neighbors = GetNeighbors(new Vector2(x, y), terrainData.heightmapWidth, terrainData.heightmapHeight);
+
+				foreach (Vector2 neighbor in neighbors)
+				{
+					averageHeight += heightMap[(int)neighbor.x, (int)neighbor.y];
+				}
+
+				heightMap[x, y] = averageHeight / (neighbors.Count + 1);
 			}
 		}
 		terrainData.SetHeights(0, 0, heightMap);
