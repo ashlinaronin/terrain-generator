@@ -28,6 +28,10 @@ public class CustomTerrainEditor : Editor {
 	SerializedProperty voronoiMinHeight;
 	SerializedProperty voronoiMaxHeight;
 	SerializedProperty voronoiType;
+	SerializedProperty mpdMinHeight;
+	SerializedProperty mpdMaxHeight;
+	SerializedProperty mpdRoughness;
+	SerializedProperty mpdHeightDampenerPower;
 
 
 
@@ -63,6 +67,10 @@ public class CustomTerrainEditor : Editor {
 		voronoiMinHeight = serializedObject.FindProperty("voronoiMinHeight");
 		voronoiMaxHeight = serializedObject.FindProperty("voronoiMaxHeight");
 		voronoiType = serializedObject.FindProperty("voronoiType");
+		mpdMinHeight = serializedObject.FindProperty("mpdMinHeight");
+		mpdMaxHeight = serializedObject.FindProperty("mpdMaxHeight");
+		mpdRoughness = serializedObject.FindProperty("mpdRoughness");
+		mpdHeightDampenerPower = serializedObject.FindProperty("mpdHeightDampenerPower");
 	}
 
 	public override void OnInspectorGUI()
@@ -160,6 +168,10 @@ public class CustomTerrainEditor : Editor {
 		showMidPointDisplacement = EditorGUILayout.Foldout(showMidPointDisplacement, "Mid Point Displacement");
 		if (showMidPointDisplacement)
 		{
+			EditorGUILayout.Slider(mpdMinHeight, -10, 0, new GUIContent("Min Height"));
+			EditorGUILayout.Slider(mpdMaxHeight, 0, 10, new GUIContent("Max Height"));
+			EditorGUILayout.Slider(mpdRoughness, 0, 5, new GUIContent("Roughness"));
+			EditorGUILayout.Slider(mpdHeightDampenerPower, 0, 1, new GUIContent("Height Dampener Power"));
 			if (GUILayout.Button("MPD"))
 			{
 				terrain.MidPointDisplacement();

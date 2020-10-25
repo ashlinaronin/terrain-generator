@@ -52,6 +52,13 @@ public class CustomTerrain : MonoBehaviour {
 	public enum VoronoiType { Linear = 0, Power = 1, Combined = 2, SinPow = 3 };
 	public VoronoiType voronoiType = VoronoiType.Linear;
 
+
+	// MIDPOINT DISPLACEMENT -----------------
+	public float mpdMinHeight = -2.0f;
+	public float mpdMaxHeight = 2.0f;
+	public float mpdRoughness = 2.0f;
+	public float mpdHeightDampenerPower = 2.0f;
+
 	public Terrain terrain;
 	public TerrainData terrainData;
 
@@ -71,32 +78,15 @@ public class CustomTerrain : MonoBehaviour {
 		// mpd algorithm likes power of 2-- 1 line of pixels will not be included (heightmapWidth is power of 2 + 1, e.g. 513)
 		int width = terrainData.heightmapWidth - 1;
 		int squareSize = width;
-		float height = squareSize / 2.0f * 0.01f;
-		float roughness = 2.0f;
-		float heightDampener = Mathf.Pow(2, -1 * roughness);
+
+		// don't want to use values from inspector directly, or they will get reset by the code in here to something almost 0
+		float minHeight = mpdMinHeight;
+		float maxHeight = mpdMaxHeight;
+		float heightDampener = (float)Mathf.Pow(mpdHeightDampenerPower, -1 * mpdRoughness);
 
 		int cornerX, cornerY;
 		int midX, midY;
 		int pmidXL, pmidXR, pmidYU, pmidYD;
-
-		// set the corners of our terrain to a random height (remember that it is a square, so we'll subtract 1 from the height map dimensions to get a power of 2)
-		// then we need to subtract one more bc of array index starting at 0
-		// need starting value to use as our average
-		// bottom left
-
-
-		/*
-		heightMap[0, 0] = UnityEngine.Random.Range(0f, 0.2f);
-
-		// top left
-		heightMap[0, terrainData.heightmapHeight - 2] = UnityEngine.Random.Range(0f, 0.2f);
-
-		// bottom right
-		heightMap[terrainData.heightmapWidth - 2, 0] = UnityEngine.Random.Range(0f, 0.2f);
-
-		// top right
-		heightMap[terrainData.heightmapWidth - 2, terrainData.heightmapHeight - 2] = UnityEngine.Random.Range(0f, 0.2f);
-		*/
 
 		// perform algorithm on smaller squares each time, until we have covered the entire mesh
 		while (squareSize > 0)
@@ -120,7 +110,7 @@ public class CustomTerrain : MonoBehaviour {
 							heightMap[x, cornerY] +
 							heightMap[cornerX, cornerY]
 						)
-						/ 4.0f + UnityEngine.Random.Range(-height, height);
+						/ 4.0f + UnityEngine.Random.Range(minHeight, maxHeight);
 				}
 			}
 
@@ -151,7 +141,7 @@ public class CustomTerrain : MonoBehaviour {
 							heightMap[midX, pmidYD] +
 							heightMap[cornerX, y] 
 						)
-						/ 4.0f + UnityEngine.Random.Range(-height, height);
+						/ 4.0f + UnityEngine.Random.Range(minHeight, maxHeight);
 
 					// calculate the square value for the left side
 					heightMap[x, midY] = 
@@ -161,7 +151,7 @@ public class CustomTerrain : MonoBehaviour {
 							heightMap[x, y] +
 							heightMap[midX, midY] 
 						)
-						/ 4.0f + UnityEngine.Random.Range(-height, height);
+						/ 4.0f + UnityEngine.Random.Range(minHeight, maxHeight);
 
 					// calculate the square value for the top side
 					heightMap[midX, cornerY] = 
@@ -171,7 +161,7 @@ public class CustomTerrain : MonoBehaviour {
 							heightMap[midX, midY] +
 							heightMap[cornerX, cornerY] 
 						)
-						/ 4.0f + UnityEngine.Random.Range(-height, height);
+						/ 4.0f + UnityEngine.Random.Range(minHeight, maxHeight);
 
 					// calculate the square value for the right side
 					heightMap[cornerX, midY] = 
@@ -181,12 +171,15 @@ public class CustomTerrain : MonoBehaviour {
 							heightMap[cornerX, y] +
 							heightMap[pmidXR, midY] 
 						)
-						/ 4.0f + UnityEngine.Random.Range(-height, height);
+						/ 4.0f + UnityEngine.Random.Range(minHeight, maxHeight);
 				}
 			}
 
 			squareSize = (int)(squareSize / 2.0f);
-			height *= heightDampener;
+
+			// need to dampen both min and max to make sure we get the rolloff effect
+			minHeight *= mpdHeightDampenerPower;
+			maxHeight *= mpdHeightDampenerPower;
 		}
 
 		terrainData.SetHeights(0, 0, heightMap);
