@@ -32,7 +32,7 @@ public class CustomTerrainEditor : Editor {
 	SerializedProperty mpdMaxHeight;
 	SerializedProperty mpdRoughness;
 	SerializedProperty mpdHeightDampenerPower;
-
+	SerializedProperty smoothAmount;
 
 
 	// fold outs ----------------------
@@ -72,6 +72,7 @@ public class CustomTerrainEditor : Editor {
 		mpdMaxHeight = serializedObject.FindProperty("mpdMaxHeight");
 		mpdRoughness = serializedObject.FindProperty("mpdRoughness");
 		mpdHeightDampenerPower = serializedObject.FindProperty("mpdHeightDampenerPower");
+		smoothAmount = serializedObject.FindProperty("smoothAmount");
 	}
 
 	public override void OnInspectorGUI()
@@ -182,6 +183,7 @@ public class CustomTerrainEditor : Editor {
 		showSmooth = EditorGUILayout.Foldout(showSmooth, "Smooth Terrain");
 		if (showSmooth)
 		{
+			EditorGUILayout.IntSlider(smoothAmount, 1, 10, new GUIContent("Smooth Amount"));
 			if (GUILayout.Button("Smooth"))
 			{
 				terrain.Smooth();
