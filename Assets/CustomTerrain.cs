@@ -83,6 +83,9 @@ public class CustomTerrain : MonoBehaviour {
 		// then we need to subtract one more bc of array index starting at 0
 		// need starting value to use as our average
 		// bottom left
+
+
+		/*
 		heightMap[0, 0] = UnityEngine.Random.Range(0f, 0.2f);
 
 		// top left
@@ -93,6 +96,7 @@ public class CustomTerrain : MonoBehaviour {
 
 		// top right
 		heightMap[terrainData.heightmapWidth - 2, terrainData.heightmapHeight - 2] = UnityEngine.Random.Range(0f, 0.2f);
+		*/
 
 		// perform algorithm on smaller squares each time, until we have covered the entire mesh
 		while (squareSize > 0)
@@ -115,6 +119,67 @@ public class CustomTerrain : MonoBehaviour {
 							heightMap[cornerX, y] +
 							heightMap[x, cornerY] +
 							heightMap[cornerX, cornerY]
+						)
+						/ 4.0f + UnityEngine.Random.Range(-height, height);
+				}
+			}
+
+			// square stage
+			for (int x = 0; x < width; x += squareSize)
+			{
+				for (int y = 0; y < width; y += squareSize)
+				{
+					cornerX = (x + squareSize);
+					cornerY = (y + squareSize);
+
+					midX = (int)(x + squareSize / 2.0f);
+					midY = (int)(y + squareSize / 2.0f);
+
+					pmidXR = (int)(midX + squareSize);
+					pmidYU = (int)(midY + squareSize);
+					pmidXL = (int)(midX - squareSize);
+					pmidYD = (int)(midY - squareSize);
+
+					// if we have pmid coordinates outside of the height map, skip this iteration of the square stage
+					if (pmidXL <= 0 || pmidYD <= 0 || pmidXR >= width - 1 || pmidYU >= width - 1) continue;
+
+					// calculate the square value for the bottom side
+					heightMap[midX, y] = 
+						(	
+							heightMap[midX, midY] +
+							heightMap[x, y] +
+							heightMap[midX, pmidYD] +
+							heightMap[cornerX, y] 
+						)
+						/ 4.0f + UnityEngine.Random.Range(-height, height);
+
+					// calculate the square value for the left side
+					heightMap[x, midY] = 
+						(	
+							heightMap[x, cornerY] +
+							heightMap[pmidXL, midY] +
+							heightMap[x, y] +
+							heightMap[midX, midY] 
+						)
+						/ 4.0f + UnityEngine.Random.Range(-height, height);
+
+					// calculate the square value for the top side
+					heightMap[midX, cornerY] = 
+						(	
+							heightMap[midX, pmidYU] +
+							heightMap[x, cornerY] +
+							heightMap[midX, midY] +
+							heightMap[cornerX, cornerY] 
+						)
+						/ 4.0f + UnityEngine.Random.Range(-height, height);
+
+					// calculate the square value for the right side
+					heightMap[cornerX, midY] = 
+						(	
+							heightMap[cornerX, cornerY] +
+							heightMap[midX, midY] +
+							heightMap[cornerX, y] +
+							heightMap[pmidXR, midY] 
 						)
 						/ 4.0f + UnityEngine.Random.Range(-height, height);
 				}
