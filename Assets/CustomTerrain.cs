@@ -64,6 +64,69 @@ public class CustomTerrain : MonoBehaviour {
 		}
 	}
 
+	public void MidPointDisplacement()
+	{
+		float[,] heightMap = GetHeightMap();
+
+		// mpd algorithm likes power of 2-- 1 line of pixels will not be included (heightmapWidth is power of 2 + 1, e.g. 513)
+		int width = terrainData.heightmapWidth - 1;
+		int squareSize = width;
+		float height = squareSize / 2.0f * 0.01f;
+		float roughness = 2.0f;
+		float heightDampener = Mathf.Pow(2, -1 * roughness);
+
+		int cornerX, cornerY;
+		int midX, midY;
+		int pmidXL, pmidXR, pmidYU, pmidYD;
+
+		// set the corners of our terrain to a random height (remember that it is a square, so we'll subtract 1 from the height map dimensions to get a power of 2)
+		// then we need to subtract one more bc of array index starting at 0
+		// need starting value to use as our average
+		// bottom left
+		heightMap[0, 0] = UnityEngine.Random.Range(0f, 0.2f);
+
+		// top left
+		heightMap[0, terrainData.heightmapHeight - 2] = UnityEngine.Random.Range(0f, 0.2f);
+
+		// bottom right
+		heightMap[terrainData.heightmapWidth - 2, 0] = UnityEngine.Random.Range(0f, 0.2f);
+
+		// top right
+		heightMap[terrainData.heightmapWidth - 2, terrainData.heightmapHeight - 2] = UnityEngine.Random.Range(0f, 0.2f);
+
+		// perform algorithm on smaller squares each time, until we have covered the entire mesh
+		while (squareSize > 0)
+		{
+			// step out a whole square to each value (diamond stage)
+			for (int x = 0; x < width; x += squareSize)
+			{
+				for (int y = 0; y < width; y += squareSize)
+				{
+					cornerX = (x + squareSize);
+					cornerY = (y + squareSize);
+
+					midX = (int)(x + squareSize / 2.0f);
+					midY = (int)(y + squareSize / 2.0f);
+
+					// set the height of the point in the middle of the square to the average of the height of each corner of the square
+					heightMap[midX, midY] = 
+						(
+							heightMap[x, y] +
+							heightMap[cornerX, y] +
+							heightMap[x, cornerY] +
+							heightMap[cornerX, cornerY]
+						)
+						/ 4.0f + UnityEngine.Random.Range(-height, height);
+				}
+			}
+
+			squareSize = (int)(squareSize / 2.0f);
+			height *= heightDampener;
+		}
+
+		terrainData.SetHeights(0, 0, heightMap);
+	}
+
 	public void Voronoi()
 	{
 		float[,] heightMap = GetHeightMap();

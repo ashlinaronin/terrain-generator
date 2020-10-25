@@ -365,10 +365,11 @@ MonoBehaviour:
     mPerlinOffsetX: 0
     mPerlinOffsetY: 0
     remove: 0
-  voronoiPeakCount: 10
-  voronoiFalloff: 0.2
-  voronoiDropoff: 0.6
+  voronoiPeakCount: 3
+  voronoiFalloff: 5.93
+  voronoiDropoff: 8.11
   voronoiMinHeight: 0.08
-  voronoiMaxHeight: 0.39
+  voronoiMaxHeight: 0.21
+  voronoiType: 3
   terrain: {fileID: 995469955}
   terrainData: {fileID: 15600000, guid: 4187ec83035934bb48fc2c531e497b60, type: 2}
