@@ -71,6 +71,32 @@ public class CustomTerrain : MonoBehaviour {
 		}
 	}
 
+	public void Smooth()
+	{
+		float [,] heightMap = GetHeightMap();
+
+		// start at 1, 1 and go to width-1, height-1 so we always have 8 neighbors
+		for (int x = 1; x < terrainData.heightmapWidth - 1; x++)
+		{
+			for (int y = 1; y < terrainData.heightmapHeight - 1; y++)
+			{
+				// blurring effect is accomplished by taking the average of the value at 9 points (8 neighbors and self)
+				heightMap[x, y] = (
+					heightMap[x - 1, y + 1] +
+					heightMap[x, y + 1] +
+					heightMap[x + 1, y + 1] +
+					heightMap[x - 1, y] +
+					heightMap[x, y] +
+					heightMap[x + 1, y] +
+					heightMap[x - 1, y - 1] +
+					heightMap[x, y - 1] + 
+					heightMap[x + 1, y - 1]
+				) / 9.0f;
+			}
+		}
+		terrainData.SetHeights(0, 0, heightMap);
+	}
+
 	public void MidPointDisplacement()
 	{
 		float[,] heightMap = GetHeightMap();

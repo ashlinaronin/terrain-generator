@@ -42,6 +42,7 @@ public class CustomTerrainEditor : Editor {
 	bool showMultiplePerlin = false;
 	bool showVoronoi = false;
 	bool showMidPointDisplacement = false;
+	bool showSmooth = false;
 
 	void OnEnable()
 	{
@@ -177,6 +178,16 @@ public class CustomTerrainEditor : Editor {
 				terrain.MidPointDisplacement();
 			}
 		}
+
+		showSmooth = EditorGUILayout.Foldout(showSmooth, "Smooth Terrain");
+		if (showSmooth)
+		{
+			if (GUILayout.Button("Smooth"))
+			{
+				terrain.Smooth();
+			}
+		}
+
 
 		EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 		if (GUILayout.Button("Reset Terrain"))
