@@ -192,6 +192,8 @@ public class CustomTerrainEditor : Editor {
 			GUILayout.Label("Splat Maps", EditorStyles.boldLabel);
 			splatMapTable = GUITableLayout.DrawTable(splatMapTable, splatHeights);
 
+			GUILayout.Space(20);
+
 			EditorGUILayout.BeginHorizontal();
 			if (GUILayout.Button("+"))
 			{
