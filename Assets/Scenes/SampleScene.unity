@@ -371,10 +371,41 @@ MonoBehaviour:
   voronoiMinHeight: 0.08
   voronoiMaxHeight: 0.21
   voronoiType: 3
-  mpdMinHeight: -6.84
-  mpdMaxHeight: 5.99
-  mpdRoughness: 2.41
-  mpdHeightDampenerPower: 0.228
+  mpdMinHeight: -0.5
+  mpdMaxHeight: 1.65
+  mpdRoughness: 1.22
+  mpdHeightDampenerPower: 0.072
   smoothAmount: 5
+  splatHeights:
+  - texture: {fileID: 2800000, guid: 79d5431cd68194d08a40d2bbe4ebcef9, type: 3}
+    minHeight: 0.1
+    maxHeight: 0.2
+    tileOffset: {x: 0, y: 0}
+    tileSize: {x: 20, y: 20}
+    remove: 0
+  - texture: {fileID: 2800000, guid: 1054f1fd930eb44b4963a1aa523cc5ac, type: 3}
+    minHeight: 0.2
+    maxHeight: 0.4
+    tileOffset: {x: 0, y: 0}
+    tileSize: {x: 50, y: 50}
+    remove: 0
+  - texture: {fileID: 2800000, guid: a4fedcb40a80e4e57b3b3d708aff9873, type: 3}
+    minHeight: 0.4
+    maxHeight: 0.5
+    tileOffset: {x: 0, y: 0}
+    tileSize: {x: 50, y: 50}
+    remove: 0
+  - texture: {fileID: 2800000, guid: 59aa96a28c32043de836d0d09ff9570e, type: 3}
+    minHeight: 0
+    maxHeight: 0.1
+    tileOffset: {x: 0, y: 0}
+    tileSize: {x: 50, y: 50}
+    remove: 0
+  - texture: {fileID: 2800000, guid: fa749c6a04ad34af5af35082813d7df8, type: 3}
+    minHeight: 0.5
+    maxHeight: 1
+    tileOffset: {x: 0, y: 0}
+    tileSize: {x: 50, y: 50}
+    remove: 0
   terrain: {fileID: 995469955}
   terrainData: {fileID: 15600000, guid: 4187ec83035934bb48fc2c531e497b60, type: 2}

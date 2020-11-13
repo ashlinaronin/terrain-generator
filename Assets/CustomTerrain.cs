@@ -434,6 +434,46 @@ public class CustomTerrain : MonoBehaviour {
 			splatIndex++;
 		}
 		terrainData.splatPrototypes = newSplatPrototypes;
+
+		float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
+		float[,,] splatmapData = new float[terrainData.alphamapWidth, terrainData.alphamapHeight, terrainData.alphamapLayers];
+
+		for (int x = 0; x < terrainData.alphamapWidth; x++)
+		{
+			for (int y = 0; y < terrainData.alphamapHeight; y++)
+			{
+				float[] splat = new float[terrainData.alphamapLayers];
+				for (int i = 0; i < splatHeights.Count; i++)
+				{
+					float thisHeightStart = splatHeights[i].minHeight;
+					float thisHeightStop = splatHeights[i].maxHeight;
+					if ((heightMap[x, y] >= thisHeightStart && heightMap[x, y] <= thisHeightStop))
+					{
+						splat[i] = 1;
+					}
+				}
+				NormalizeVector(splat);
+				for (int j = 0; j < splatHeights.Count; j++)
+				{
+					splatmapData[x, y, j] = splat[j];
+				}
+			}
+		}
+		terrainData.SetAlphamaps(0, 0, splatmapData);
+	}
+
+	void NormalizeVector(float[] vector)
+	{
+		float total = 0;
+		for (int i = 0; i < vector.Length; i++)
+		{
+			total += vector[i];
+		}
+
+		for (int i = 0; i < vector.Length; i++)
+		{
+			vector[i] /= total;
+		}
 	}
 
 	public void LoadTexture()
