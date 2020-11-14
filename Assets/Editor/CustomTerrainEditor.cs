@@ -80,11 +80,17 @@ public class CustomTerrainEditor : Editor {
 		splatHeights = serializedObject.FindProperty("splatHeights");
 	}
 
+	Vector2 scrollPos;
 	public override void OnInspectorGUI()
 	{
 		serializedObject.Update();
 
 		CustomTerrain terrain = (CustomTerrain)target;
+
+		// scrollbar starting code
+		Rect r = EditorGUILayout.BeginVertical();
+		scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(r.width), GUILayout.Height(r.height));
+		EditorGUI.indentLevel++;
 
 		EditorGUILayout.PropertyField(resetTerrain);
 
@@ -227,6 +233,10 @@ public class CustomTerrainEditor : Editor {
 		{
 			terrain.ResetTerrain();
 		}
+
+		// scrollbar ending code
+		EditorGUILayout.EndScrollView();
+		EditorGUILayout.EndVertical();
 
 		serializedObject.ApplyModifiedProperties();
 	}
