@@ -68,6 +68,8 @@ public class CustomTerrain : MonoBehaviour {
 		public Texture2D texture = null;
 		public float minHeight = 0.1f;
 		public float maxHeight = 0.2f;
+		public float minSlope = 0;
+		public float maxSlope = 1.5f;
 		public Vector2 tileOffset = new Vector2(0, 0);
 		public Vector2 tileSize = new Vector2(50, 50);
 		public float splatOffset = 0.1f;
@@ -424,6 +426,24 @@ public class CustomTerrain : MonoBehaviour {
 		splatHeights = keptSplatHeights;	
 	}
 
+	float GetSteepness(float[,] heightMap, int x, int y, int mapWidth, int mapHeight)
+	{
+		float height = heightMap[x, y];
+		int neighborX = x + 1;
+		int neighborY = y + 1;
+
+		// if on the upper edge of the map find gradient by going backward
+		if (neighborX > mapWidth - 1) neighborX = x - 1;
+		if (neighborY > mapHeight - 1) neighborY = y - 1;
+
+		float deltaX = heightMap[neighborX, y] - height;
+		float deltaY = heightMap[x, neighborY] - height;
+		Vector2 gradient = new Vector2(deltaX, deltaY);
+
+		float steepness = gradient.magnitude;
+		return steepness;
+	}
+
 	public void SplatMaps()
 	{
 		SplatPrototype[] newSplatPrototypes;
@@ -457,7 +477,11 @@ public class CustomTerrain : MonoBehaviour {
 					float offset = splatHeights[i].splatOffset + noise;
 					float thisHeightStart = splatHeights[i].minHeight - offset;
 					float thisHeightStop = splatHeights[i].maxHeight + offset;
-					if ((heightMap[x, y] >= thisHeightStart && heightMap[x, y] <= thisHeightStop))
+					float steepness = GetSteepness(heightMap, x, y, terrainData.heightmapWidth, terrainData.heightmapHeight);
+
+					bool heightWithinRange = heightMap[x, y] >= thisHeightStart && heightMap[x, y] <= thisHeightStop;
+					bool steepnessWithinRange = steepness >= splatHeights[i].minSlope && steepness <= splatHeights[i].maxSlope;
+					if (heightWithinRange && steepnessWithinRange)
 					{
 						splat[i] = 1;
 					}
