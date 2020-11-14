@@ -69,7 +69,7 @@ public class CustomTerrain : MonoBehaviour {
 		public float minHeight = 0.1f;
 		public float maxHeight = 0.2f;
 		public float minSlope = 0;
-		public float maxSlope = 1.5f;
+		public float maxSlope = 90;
 		public Vector2 tileOffset = new Vector2(0, 0);
 		public Vector2 tileSize = new Vector2(50, 50);
 		public float splatOffset = 0.1f;
@@ -426,24 +426,6 @@ public class CustomTerrain : MonoBehaviour {
 		splatHeights = keptSplatHeights;	
 	}
 
-	float GetSteepness(float[,] heightMap, int x, int y, int mapWidth, int mapHeight)
-	{
-		float height = heightMap[x, y];
-		int neighborX = x + 1;
-		int neighborY = y + 1;
-
-		// if on the upper edge of the map find gradient by going backward
-		if (neighborX > mapWidth - 1) neighborX = x - 1;
-		if (neighborY > mapHeight - 1) neighborY = y - 1;
-
-		float deltaX = heightMap[neighborX, y] - height;
-		float deltaY = heightMap[x, neighborY] - height;
-		Vector2 gradient = new Vector2(deltaX, deltaY);
-
-		float steepness = gradient.magnitude;
-		return steepness;
-	}
-
 	public void SplatMaps()
 	{
 		SplatPrototype[] newSplatPrototypes;
@@ -477,7 +459,9 @@ public class CustomTerrain : MonoBehaviour {
 					float offset = splatHeights[i].splatOffset + noise;
 					float thisHeightStart = splatHeights[i].minHeight - offset;
 					float thisHeightStop = splatHeights[i].maxHeight + offset;
-					float steepness = GetSteepness(heightMap, x, y, terrainData.heightmapWidth, terrainData.heightmapHeight);
+
+					// splat map at 90deg to height map, so we flip x and y. not sure why!
+					float steepness = terrainData.GetSteepness(y / (float)terrainData.alphamapHeight, x / (float)terrainData.alphamapWidth);
 
 					bool heightWithinRange = heightMap[x, y] >= thisHeightStart && heightMap[x, y] <= thisHeightStop;
 					bool steepnessWithinRange = steepness >= splatHeights[i].minSlope && steepness <= splatHeights[i].maxSlope;
