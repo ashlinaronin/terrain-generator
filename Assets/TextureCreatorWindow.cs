@@ -60,13 +60,65 @@ public class TextureCreatorWindow : EditorWindow {
 			{
 				for (int y = 0; y < height; y++)
 				{
-					pValue = Utils.fractalBrownianMotion(
-						(x + perlinOffsetX) * perlinXScale,
-						(y + perlinOffsetY) * perlinYScale,
-						perlinOctaves,
-						perlinPersistence,
-						2 // todo: is this a good frequencyMultiplier?
-					) * perlinHeightScale;
+					if (seamlessToggle)
+					{
+						float u = (float)x / (float)width;
+						float v = (float)y / (float)height;
+						// these each correspond to one pixel in a 2x2 grid with the current pixel at the bottom left
+						float noise00 = Utils.fractalBrownianMotion(
+							(x + perlinOffsetX) * perlinXScale,
+							(y + perlinOffsetY) * perlinYScale,
+							perlinOctaves,
+							perlinPersistence,
+							2 // todo: is this a good frequencyMultiplier?
+						) * perlinHeightScale;
+						float noise01 = Utils.fractalBrownianMotion(
+							(x + perlinOffsetX) * perlinXScale,
+							(y + perlinOffsetY + height) * perlinYScale,
+							perlinOctaves,
+							perlinPersistence,
+							2
+						) * perlinHeightScale;
+						float noise10 = Utils.fractalBrownianMotion(
+							(x + perlinOffsetX + width) * perlinXScale,
+							(y + perlinOffsetY) * perlinYScale,
+							perlinOctaves,
+							perlinPersistence,
+							2
+						) * perlinHeightScale;
+						float noise11 = Utils.fractalBrownianMotion(
+							(x + perlinOffsetX + width) * perlinXScale,
+							(y + perlinOffsetY + height) * perlinYScale,
+							perlinOctaves,
+							perlinPersistence,
+							2
+						) * perlinHeightScale;
+
+						// all the magic of the seamlessness!
+						// these factors cancel out the current coords, e.g. 0 * 0 * noise0 = 0
+						float noiseTotal =
+							(u * v * noise00) +
+							(u * (1 - v) * noise01) +
+							((1 - u) * v * noise10) +
+							((1 - u) * (1 - v) * noise11);
+
+						// create a color pixel and then turn it into grayscale?
+						float value = (int)(256 * noiseTotal) + 50;
+						float r = Mathf.Clamp((int)noise00, 0, 255); // this is the current pixel
+						float g = Mathf.Clamp(value, 0, 255); // this is the noise of all the surrounding pixels
+						float b = Mathf.Clamp(value + 50, 0, 255); // likewise, + 50
+						pValue = (r + g + b) / (3 * 255.0f);
+					}
+					else
+					{
+						pValue = Utils.fractalBrownianMotion(
+							(x + perlinOffsetX) * perlinXScale,
+							(y + perlinOffsetY) * perlinYScale,
+							perlinOctaves,
+							perlinPersistence,
+							2 // todo: is this a good frequencyMultiplier?
+						) * perlinHeightScale;
+					}
 
 					float colValue = pValue;
 					pixelColor = new Color(colValue, colValue, colValue, alphaToggle ? colValue : 1);
