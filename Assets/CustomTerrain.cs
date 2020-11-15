@@ -525,15 +525,15 @@ public class CustomTerrain : MonoBehaviour {
 	public void ApplyVegetation()
 	{
 		// any thing that we want to apply multiples of (not necessarily a "tree")
-		TreePrototype[] newTreePrototypes;
-		newTreePrototypes = new TreePrototype[vegetation.Count];
+		TreePrototype[] newTreePrototypes = new TreePrototype[vegetation.Count];
 
-		// todo: does this not work?
 		for (int treeIndex = 0; treeIndex < vegetation.Count; treeIndex++)
 		{
-			newTreePrototypes[treeIndex] = new TreePrototype();
-			newTreePrototypes[treeIndex].prefab = vegetation[treeIndex].mesh;
+			newTreePrototypes[treeIndex] = new TreePrototype() {
+				prefab = vegetation[treeIndex].mesh
+			};
 		}
+
 		terrainData.treePrototypes = newTreePrototypes;
 	}
 

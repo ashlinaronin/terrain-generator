@@ -251,16 +251,16 @@ public class CustomTerrainEditor : Editor {
 			EditorGUILayout.BeginHorizontal();
 			if (GUILayout.Button("+"))
 			{
-				// terrain.AddNewVegetation();
+				terrain.AddNewVegetation();
 			}
 			if (GUILayout.Button("-"))
 			{
-				// terrain.RemoveVegetation();
+				terrain.RemoveVegetation();
 			}
 			EditorGUILayout.EndHorizontal();
 			if (GUILayout.Button("Apply Vegetation"))
 			{
-				// terrain.ApplyVegetation();
+				terrain.ApplyVegetation();
 			}
 		}
 
