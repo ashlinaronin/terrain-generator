@@ -84,6 +84,26 @@ public class CustomTerrain : MonoBehaviour {
 	};
 
 
+	// VEGETATION ------------------------------------
+	[System.Serializable]
+	public class Vegetation {
+		public GameObject mesh;
+		public float minHeight = 0.1f;
+		public float maxHeight = 0.2f;
+		public float minSlope = 0;
+		public float maxSlope = 90;
+		public bool remove = false;
+	}
+
+	public List<Vegetation> vegetation = new List<Vegetation>()
+	{
+		new Vegetation()
+	};
+
+	public int maxTrees = 5000;
+	public int treeSpacing = 5;
+
+
 
 	public Terrain terrain;
 	public TerrainData terrainData;
@@ -426,7 +446,7 @@ public class CustomTerrain : MonoBehaviour {
 		splatHeights = keptSplatHeights;	
 	}
 
-	public void SplatMaps()
+	public void ApplySplatMaps()
 	{
 		SplatPrototype[] newSplatPrototypes;
 		newSplatPrototypes = new SplatPrototype[splatHeights.Count];
@@ -478,6 +498,43 @@ public class CustomTerrain : MonoBehaviour {
 			}
 		}
 		terrainData.SetAlphamaps(0, 0, splatmapData);
+	}
+
+	public void AddNewVegetation()
+	{
+		vegetation.Add(new Vegetation());
+	}
+
+	public void RemoveVegetation()
+	{
+		List<Vegetation> keptVegetation = new List<Vegetation>();
+		for (int i = 0; i < vegetation.Count; i++)
+		{
+			if (!vegetation[i].remove)
+			{
+				keptVegetation.Add(vegetation[i]);
+			}
+		}
+		if (keptVegetation.Count == 0) // don't want to keep any
+		{
+			keptVegetation.Add(vegetation[0]); // add at least 1
+		}
+		vegetation = keptVegetation;	
+	}
+
+	public void ApplyVegetation()
+	{
+		// any thing that we want to apply multiples of (not necessarily a "tree")
+		TreePrototype[] newTreePrototypes;
+		newTreePrototypes = new TreePrototype[vegetation.Count];
+
+		// todo: does this not work?
+		for (int treeIndex = 0; treeIndex < vegetation.Count; treeIndex++)
+		{
+			newTreePrototypes[treeIndex] = new TreePrototype();
+			newTreePrototypes[treeIndex].prefab = vegetation[treeIndex].mesh;
+		}
+		terrainData.treePrototypes = newTreePrototypes;
 	}
 
 	void NormalizeVector(float[] vector)
