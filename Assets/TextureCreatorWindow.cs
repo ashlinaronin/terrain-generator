@@ -39,7 +39,7 @@ public class TextureCreatorWindow : EditorWindow {
 		GUILayout.Label("Settings", EditorStyles.boldLabel);
 		filename = EditorGUILayout.TextField("Texture Name", filename);
 
-		int wSize = (int)(EditorGUIUtility.currentViewWidth - 100);
+		int viewWidth = (int)(EditorGUIUtility.currentViewWidth - 100);
 
 		perlinXScale = EditorGUILayout.Slider("X Scale", perlinXScale, 0, 0.1f);
 		perlinYScale = EditorGUILayout.Slider("Y Scale", perlinYScale, 0, 0.1f);
@@ -60,7 +60,7 @@ public class TextureCreatorWindow : EditorWindow {
 		// begin centered row
 		GUILayout.BeginHorizontal();
 		GUILayout.FlexibleSpace();
-		if (GUILayout.Button("Generate", GUILayout.Width(wSize)))
+		if (GUILayout.Button("Generate", GUILayout.Width(viewWidth)))
 		{
 			int width = 513;
 			int height = 513;
@@ -167,7 +167,7 @@ public class TextureCreatorWindow : EditorWindow {
 		// begin centered row
 		GUILayout.BeginHorizontal();
 		GUILayout.FlexibleSpace();
-		GUILayout.Label(pTexture, GUILayout.Width(wSize), GUILayout.Height(wSize));
+		GUILayout.Label(pTexture, GUILayout.Width(viewWidth), GUILayout.Height(viewWidth));
 		GUILayout.FlexibleSpace();
 		GUILayout.EndHorizontal();
 		// end centered row
@@ -175,7 +175,7 @@ public class TextureCreatorWindow : EditorWindow {
 		// begin centered row
 		GUILayout.BeginHorizontal();
 		GUILayout.FlexibleSpace();
-		if (GUILayout.Button("Save", GUILayout.Width(wSize)))
+		if (GUILayout.Button("Save", GUILayout.Width(viewWidth)))
 		{
 			byte[] bytes = pTexture.EncodeToPNG();
 			System.IO.Directory.CreateDirectory(Application.dataPath + "/SavedTextures"); // asset folder

@@ -37,6 +37,9 @@ public class CustomTerrainEditor : Editor {
 	SerializedProperty splatHeights;
 
 
+	Texture2D heightMapTexture;
+
+
 	// fold outs ----------------------
 	bool showRandom = false;
 	bool showLoadHeights = false;
@@ -46,6 +49,7 @@ public class CustomTerrainEditor : Editor {
 	bool showMidPointDisplacement = false;
 	bool showSmooth = false;
 	bool showSplatMaps = false;
+	bool showHeightMap = false;
 
 	void OnEnable()
 	{
@@ -78,11 +82,18 @@ public class CustomTerrainEditor : Editor {
 		smoothAmount = serializedObject.FindProperty("smoothAmount");
 		splatMapTable = new GUITableState("splatMapTable");
 		splatHeights = serializedObject.FindProperty("splatHeights");
+
+		CustomTerrain terrain = (CustomTerrain)target;
+
+		// TODO: what happens when height map width or height change?
+		heightMapTexture = new Texture2D(terrain.terrainData.heightmapWidth, terrain.terrainData.heightmapHeight, TextureFormat.ARGB32, false);
 	}
 
 	Vector2 scrollPos;
 	public override void OnInspectorGUI()
 	{
+		int viewWidth = (int)(EditorGUIUtility.currentViewWidth - 100);
+
 		serializedObject.Update();
 
 		CustomTerrain terrain = (CustomTerrain)target;
@@ -234,10 +245,54 @@ public class CustomTerrainEditor : Editor {
 			terrain.ResetTerrain();
 		}
 
+		showHeightMap = EditorGUILayout.Foldout(showHeightMap, "Height Map");
+		if (showHeightMap)
+		{
+			// begin centered row
+			GUILayout.BeginHorizontal();
+			GUILayout.FlexibleSpace();
+			GUILayout.Label(heightMapTexture, GUILayout.Width(viewWidth), GUILayout.Height(viewWidth));
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
+			// end centered row
+
+			// begin centered row
+			GUILayout.BeginHorizontal();
+			GUILayout.FlexibleSpace();
+			if (GUILayout.Button("Refresh", GUILayout.Width(viewWidth)))
+			{
+				float[,] heights = terrain.terrainData.GetHeights(0, 0, terrain.terrainData.heightmapWidth, terrain.terrainData.heightmapHeight);
+				LoadArrayToTexture2D(heightMapTexture, heights);
+			}
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
+			// end centered row
+		}
+
 		// scrollbar ending code
 		EditorGUILayout.EndScrollView();
 		EditorGUILayout.EndVertical();
 
 		serializedObject.ApplyModifiedProperties();
 	}
+
+	void LoadArrayToTexture2D(Texture2D texture, float[,] heightMapArray)
+	{
+		int width = heightMapArray.GetLength(0);
+		int height = heightMapArray.GetLength(1);
+
+		for (int x = 0; x < width; x++)
+		{
+			for (int y = 0; y < height; y++)
+			{
+				float grayscaleValue = heightMapArray[x, y];
+				Color newColor = new Color(grayscaleValue, grayscaleValue, grayscaleValue, 1);
+				heightMapTexture.SetPixel(x, y, newColor);
+			}
+		}
+		
+		texture.Apply(false, false);
+	}
+
 }
+
