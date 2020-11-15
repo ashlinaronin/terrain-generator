@@ -144,7 +144,9 @@ public class TextureCreatorWindow : EditorWindow {
 		GUILayout.FlexibleSpace();
 		if (GUILayout.Button("Save", GUILayout.Width(wSize)))
 		{
-
+			byte[] bytes = pTexture.EncodeToPNG();
+			System.IO.Directory.CreateDirectory(Application.dataPath + "/SavedTextures"); // asset folder
+			File.WriteAllBytes(Application.dataPath + "/SavedTextures/" + filename + ".png", bytes);
 		}
 		GUILayout.FlexibleSpace();
 		GUILayout.EndHorizontal();
