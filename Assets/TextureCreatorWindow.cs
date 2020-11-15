@@ -15,6 +15,11 @@ public class TextureCreatorWindow : EditorWindow {
 	bool alphaToggle = false;
 	bool seamlessToggle = false;
 	bool mapToggle = false;
+
+	float brightness = 0.5f;
+	float contrast = 0.5f;
+
+
 	Texture2D pTexture;
 
 
@@ -43,9 +48,14 @@ public class TextureCreatorWindow : EditorWindow {
 		perlinHeightScale = EditorGUILayout.Slider("Height Scale", perlinHeightScale, 0, 1);
 		perlinOffsetX = EditorGUILayout.IntSlider("Offset X", perlinOffsetX, 0, 10000);
 		perlinOffsetY = EditorGUILayout.IntSlider("Offset Y", perlinOffsetY, 0, 10000);
+		brightness = EditorGUILayout.Slider("Brightness", brightness, 0, 2);
+		contrast = EditorGUILayout.Slider("Contrast", contrast, 0, 2);
 		alphaToggle = EditorGUILayout.Toggle("Alpha?", alphaToggle);
 		mapToggle = EditorGUILayout.Toggle("Map?", mapToggle);
 		seamlessToggle = EditorGUILayout.Toggle("Seamless", seamlessToggle);
+	
+		float minColor = 1;
+		float maxColor = 0;
 
 		// begin centered row
 		GUILayout.BeginHorizontal();
@@ -120,11 +130,34 @@ public class TextureCreatorWindow : EditorWindow {
 						) * perlinHeightScale;
 					}
 
-					float colValue = pValue;
-					pixelColor = new Color(colValue, colValue, colValue, alphaToggle ? colValue : 1);
+					// common graphics approach to integrating contrast and brightness with existing value
+					float colorValue = contrast * (pValue - 0.5f) + 0.5f * brightness;
+
+					if (minColor > colorValue) minColor = colorValue;
+					if (maxColor < colorValue) maxColor = colorValue;
+
+					pixelColor = new Color(colorValue, colorValue, colorValue, alphaToggle ? colorValue : 1);
 					pTexture.SetPixel(x, y, pixelColor);
 				} 
 			}
+
+			if (mapToggle)
+			{
+				for (int x = 0; x < width; x++)
+				{
+					for (int y = 0; y < height; y++)
+					{
+						pixelColor = pTexture.GetPixel(x, y);
+						float colorValue = pixelColor.r; // doesn't matter which one we use, any will do
+						colorValue = Utils.Map(colorValue, minColor, maxColor, 0, 1);
+						pixelColor.r = colorValue;
+						pixelColor.g = colorValue;
+						pixelColor.b = colorValue;
+						pTexture.SetPixel(x, y, pixelColor);
+					}
+				}
+			}
+
 			pTexture.Apply(false, false);
 		}
 		GUILayout.FlexibleSpace();

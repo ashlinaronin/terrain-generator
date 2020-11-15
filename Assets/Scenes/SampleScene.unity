@@ -335,8 +335,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   randomHeightRange: {x: 0, y: 0.1}
-  heightMapImage: {fileID: 2800000, guid: 6041c42ee7e5a4ac1ba55ecb97c7b11f, type: 3}
-  heightMapScale: {x: 4, y: 1, z: 4}
+  heightMapImage: {fileID: 2800000, guid: 1d4152985176e4ba0969c63463756f5c, type: 3}
+  heightMapScale: {x: 4, y: 0.1, z: 4}
   resetTerrain: 0
   perlinXScale: 0.018
   perlinYScale: 0.018
@@ -406,6 +406,18 @@ MonoBehaviour:
     maxHeight: 1
     minSlope: 0
     maxSlope: 45
+    tileOffset: {x: 0, y: 0}
+    tileSize: {x: 50, y: 50}
+    splatOffset: 0.1
+    splatXScale: 0.01
+    splatYScale: 0.01
+    splatNoiseScaler: 0.1
+    remove: 0
+  - texture: {fileID: 2800000, guid: 5047aaf5f4701447ea5f563f9131c646, type: 3}
+    minHeight: 0
+    maxHeight: 0.4
+    minSlope: 45
+    maxSlope: 90
     tileOffset: {x: 0, y: 0}
     tileSize: {x: 50, y: 50}
     splatOffset: 0.1
