@@ -566,6 +566,36 @@ public class CustomTerrain : MonoBehaviour {
 						terrainData.GetHeight(x, z) / terrainData.size.y,
 						(z + UnityEngine.Random.Range(-tree.randomOffset, tree.randomOffset)) / terrainData.size.z
 					);
+
+					// if this tree is set to be positioned off of the terrain mesh, then skip adding it
+					if (
+						instance.position.x > 1.0 ||
+						instance.position.x < 0.0 ||
+						instance.position.z > 1.0 ||
+						instance.position.z < 0.0
+					)
+					{
+						continue;
+					}
+
+					// raycast to re-position tree more accurately on surface of terrain
+					Vector3 treeWorldPosition = new Vector3(
+						instance.position.x * terrainData.size.x,
+						instance.position.y * terrainData.size.y,
+						instance.position.z * terrainData.size.z
+					) + this.transform.position;
+					RaycastHit hit;
+					int layerMask = 1 << terrainLayer;
+					if (
+						Physics.Raycast(treeWorldPosition, -Vector3.up, out hit, 100, layerMask) ||
+						Physics.Raycast(treeWorldPosition, Vector3.up, out hit, 100, layerMask)
+					)
+					{
+						float treeHeight = (hit.point.y - this.transform.position.y) / terrainData.size.y;
+						instance.position = new Vector3(instance.position.x, treeHeight, instance.position.z);
+					}
+				
+
 					instance.rotation = UnityEngine.Random.Range(0, 360);
 					instance.prototypeIndex = treeProtoIndex;
 					instance.color = Color.white;
