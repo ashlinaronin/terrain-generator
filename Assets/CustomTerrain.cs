@@ -7,6 +7,11 @@ using System.Linq;
 [ExecuteInEditMode]
 public class CustomTerrain : MonoBehaviour {
 
+	public enum TagType { Tag = 0, Layer = 1 };
+
+	[SerializeField]	
+	int terrainLayer = -1;
+
 	public Vector2 randomHeightRange = new Vector2(0, 0.1f);
 	public Texture2D heightMapImage;
 	public Vector3 heightMapScale = new Vector3(1, 1, 1);
@@ -553,7 +558,7 @@ public class CustomTerrain : MonoBehaviour {
 
 					float thisHeight = terrainData.GetHeight(x, z) / terrainData.size.y;
 
-					// skip if we don't want this tree at this height
+					// skip if we don't want this tree at this height 
 					if (thisHeight > tree.maxHeight || thisHeight < tree.minHeight) continue;
 			
 					instance.position = new Vector3(
@@ -631,23 +636,29 @@ public class CustomTerrain : MonoBehaviour {
 		terrainData = terrain.terrainData;
 	}
 
+
 	void Awake()
 	{
 		SerializedObject tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
 		SerializedProperty tagsProp = tagManager.FindProperty("tags");
 
-		AddTag(tagsProp, "Terrain");
-		AddTag(tagsProp, "Cloud");
-		AddTag(tagsProp, "Shore");
+		AddTag(tagsProp, "Terrain", TagType.Tag);
+		AddTag(tagsProp, "Cloud", TagType.Tag);
+		AddTag(tagsProp, "Shore", TagType.Tag);
 
 		// apply tag changes to tag database
 		tagManager.ApplyModifiedProperties();
 
-		// tag this object
+		SerializedProperty layerProp = tagManager.FindProperty("layers");
+		terrainLayer = AddTag(layerProp, "Terrain", TagType.Layer);
+		tagManager.ApplyModifiedProperties();
+
+		// apply tag and layer
 		this.gameObject.tag = "Terrain";
+		this.gameObject.layer = terrainLayer;
 	}
 
-	void AddTag(SerializedProperty tagsProp, string newTag)
+	int AddTag(SerializedProperty tagsProp, string newTag, TagType tType)
 	{
 		bool found = false;
 
@@ -655,15 +666,37 @@ public class CustomTerrain : MonoBehaviour {
 		for (int i = 0; i < tagsProp.arraySize; i++)
 		{
 			SerializedProperty t = tagsProp.GetArrayElementAtIndex(i);
-			if (t.stringValue.Equals(newTag)) { found = true; break;}
+			if (t.stringValue.Equals(newTag)) {
+				found = true;
+				return i;
+			}
 		}
 
-		// add your new tag
-		if (!found)
+		// add new tag
+		if (!found && tType == TagType.Tag)
 		{
 			tagsProp.InsertArrayElementAtIndex(0);
 			SerializedProperty newTagProp = tagsProp.GetArrayElementAtIndex(0);
 			newTagProp.stringValue = newTag;
 		}
+
+		// add new layer
+		else if (!found && tType == TagType.Layer)
+		{
+			for (int i = 8; i < tagsProp.arraySize; i++)
+			{
+				SerializedProperty newLayer = tagsProp.GetArrayElementAtIndex(i);
+				
+				// add layer in next empty slot
+				if (newLayer.stringValue == "")
+				{
+					newLayer.stringValue = newTag;
+					return i;
+				}
+			}
+		}
+
+		// not found and wasn't able to create... perhaps all layer slots are used?
+		return -1;
 	}
 }
