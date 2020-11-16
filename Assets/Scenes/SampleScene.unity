@@ -385,8 +385,8 @@ MonoBehaviour:
     tileOffset: {x: 0, y: 0}
     tileSize: {x: 50, y: 50}
     splatOffset: 0.1
-    splatXScale: 0.01
-    splatYScale: 0.01
+    splatNoiseXScale: 0.01
+    splatNoiseYScale: 0.01
     splatNoiseScaler: 0.1
     remove: 1
   - texture: {fileID: 2800000, guid: 27f896e8cb56a467885c23b4ab985df8, type: 3}
@@ -397,8 +397,8 @@ MonoBehaviour:
     tileOffset: {x: 0, y: 0}
     tileSize: {x: 50, y: 50}
     splatOffset: 0.1
-    splatXScale: 0.01
-    splatYScale: 0.01
+    splatNoiseXScale: 0.01
+    splatNoiseYScale: 0.01
     splatNoiseScaler: 0.1
     remove: 0
   - texture: {fileID: 2800000, guid: dd49ed99f55924d13bacefd240626bc5, type: 3}
@@ -409,8 +409,8 @@ MonoBehaviour:
     tileOffset: {x: 0, y: 0}
     tileSize: {x: 50, y: 50}
     splatOffset: 0.1
-    splatXScale: 0.01
-    splatYScale: 0.01
+    splatNoiseXScale: 0.01
+    splatNoiseYScale: 0.01
     splatNoiseScaler: 0.1
     remove: 0
   - texture: {fileID: 2800000, guid: 5047aaf5f4701447ea5f563f9131c646, type: 3}
@@ -421,9 +421,26 @@ MonoBehaviour:
     tileOffset: {x: 0, y: 0}
     tileSize: {x: 50, y: 50}
     splatOffset: 0.1
-    splatXScale: 0.01
-    splatYScale: 0.01
+    splatNoiseXScale: 0.01
+    splatNoiseYScale: 0.01
     splatNoiseScaler: 0.1
     remove: 0
+  vegetation:
+  - mesh: {fileID: 100000, guid: 0f362a31bd1113061100b7a844295342, type: 3}
+    minHeight: 0.1
+    maxHeight: 0.2
+    minSlope: 0
+    maxSlope: 90
+    randomOffset: 0.05
+    remove: 0
+  - mesh: {fileID: 100000, guid: 10337ad1bd11abca11002b7b44295342, type: 3}
+    minHeight: 0.1
+    maxHeight: 0.2
+    minSlope: 0
+    maxSlope: 90
+    randomOffset: 0.05
+    remove: 0
+  maxTrees: 5000
+  treeSpacing: 9
   terrain: {fileID: 995469955}
   terrainData: {fileID: 15600000, guid: 4187ec83035934bb48fc2c531e497b60, type: 2}

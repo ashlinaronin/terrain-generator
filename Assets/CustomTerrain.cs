@@ -92,6 +92,7 @@ public class CustomTerrain : MonoBehaviour {
 		public float maxHeight = 0.2f;
 		public float minSlope = 0;
 		public float maxSlope = 90;
+		public float randomOffset = 5.0f;
 		public bool remove = false;
 	}
 
@@ -535,6 +536,43 @@ public class CustomTerrain : MonoBehaviour {
 		}
 
 		terrainData.treePrototypes = newTreePrototypes;
+
+		List<TreeInstance> allVegetation = new List<TreeInstance>();
+
+		// now working in world coordinates, not height map coordinates
+		for (int x = 0; x < terrainData.size.x; x += treeSpacing)
+		{
+			for (int z = 0; z < terrainData.size.z; z += treeSpacing)
+			{
+				for (int treeProtoIndex = 0; treeProtoIndex < terrainData.treePrototypes.Length; treeProtoIndex++)
+				{
+					// todo: clean up syntax with {}?
+					// float thisHeight = terrainData.GetHeight(x, z) / terrainData.size.y;
+					TreeInstance instance = new TreeInstance();
+
+					float randomOffset = vegetation[treeProtoIndex].randomOffset;
+					instance.position = new Vector3(
+						(x + UnityEngine.Random.Range(-randomOffset, randomOffset))/ terrainData.size.x,
+						terrainData.GetHeight(x, z) / terrainData.size.y,
+						(z + UnityEngine.Random.Range(-randomOffset, randomOffset)) / terrainData.size.z
+					);
+					instance.rotation = UnityEngine.Random.Range(0, 360);
+					instance.prototypeIndex = treeProtoIndex;
+					instance.color = Color.white;
+					instance.lightmapColor = Color.white;
+					instance.heightScale = 0.95f;
+					instance.widthScale = 0.95f;
+
+					allVegetation.Add(instance);
+
+					// todo: find alternative to goto
+					if (allVegetation.Count >= maxTrees) goto TREESDONE;
+				}
+			}
+		}
+
+		TREESDONE:
+			terrainData.treeInstances = allVegetation.ToArray();
 	}
 
 	void NormalizeVector(float[] vector)
