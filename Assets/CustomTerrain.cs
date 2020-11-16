@@ -549,12 +549,17 @@ public class CustomTerrain : MonoBehaviour {
 					// todo: clean up syntax with {}?
 					// float thisHeight = terrainData.GetHeight(x, z) / terrainData.size.y;
 					TreeInstance instance = new TreeInstance();
+					Vegetation tree = vegetation[treeProtoIndex];
 
-					float randomOffset = vegetation[treeProtoIndex].randomOffset;
+					float thisHeight = terrainData.GetHeight(x, z) / terrainData.size.y;
+
+					// skip if we don't want this tree at this height
+					if (thisHeight > tree.maxHeight || thisHeight < tree.minHeight) continue;
+			
 					instance.position = new Vector3(
-						(x + UnityEngine.Random.Range(-randomOffset, randomOffset))/ terrainData.size.x,
+						(x + UnityEngine.Random.Range(-tree.randomOffset, tree.randomOffset))/ terrainData.size.x,
 						terrainData.GetHeight(x, z) / terrainData.size.y,
-						(z + UnityEngine.Random.Range(-randomOffset, randomOffset)) / terrainData.size.z
+						(z + UnityEngine.Random.Range(-tree.randomOffset, tree.randomOffset)) / terrainData.size.z
 					);
 					instance.rotation = UnityEngine.Random.Range(0, 360);
 					instance.prototypeIndex = treeProtoIndex;

@@ -434,13 +434,13 @@ MonoBehaviour:
     randomOffset: 0.05
     remove: 0
   - mesh: {fileID: 100000, guid: 10337ad1bd11abca11002b7b44295342, type: 3}
-    minHeight: 0.1
-    maxHeight: 0.2
+    minHeight: 0
+    maxHeight: 0.1
     minSlope: 0
     maxSlope: 90
     randomOffset: 0.05
     remove: 0
-  maxTrees: 5000
-  treeSpacing: 9
+  maxTrees: 8598
+  treeSpacing: 8
   terrain: {fileID: 995469955}
   terrainData: {fileID: 15600000, guid: 4187ec83035934bb48fc2c531e497b60, type: 2}
