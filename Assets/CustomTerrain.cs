@@ -117,6 +117,30 @@ public class CustomTerrain : MonoBehaviour {
 	public int maxTrees = 5000;
 	public int treeSpacing = 5;
 
+	// DETAILS -------------------------------------------
+	[System.Serializable]
+	public class Detail
+	{
+		public GameObject prototype = null;
+		public Texture2D prototypeTexture = null;
+		public float minHeight = 0.1f;
+		public float maxHeight = 0.2f;
+		public float minSlope = 0;
+		public float maxSlope = 1;
+		public float overlap = 0.01f;
+		public float feather = 0.05f;
+		public float density = 0.5f;
+		public bool remove = false;
+	}
+
+	public List<Detail> details = new List<Detail>()
+	{
+		new Detail()
+	};
+
+	public int maxDetails = 5000;
+	public int detailSpacing = 5;
+
 
 
 	public Terrain terrain;
@@ -639,6 +663,76 @@ public class CustomTerrain : MonoBehaviour {
 		TREESDONE:
 			terrainData.treeInstances = allVegetation.ToArray();
 	}
+
+	public void AddNewDetails()
+	{
+		details.Add(new Detail());
+	}
+
+	public void RemoveDetails()
+	{
+		List<Detail> keptDetails = new List<Detail>();
+		for (int i = 0; i < details.Count; i++)
+		{
+			if (!details[i].remove)
+			{
+				keptDetails.Add(details[i]);
+			}
+		}
+		if (keptDetails.Count == 0) // don't want to keep any
+		{
+			keptDetails.Add(details[0]); // add at least 1
+		}
+		details = keptDetails;	
+	}
+
+	public void ApplyDetails()
+	{
+		DetailPrototype[] newDetailPrototypes = new DetailPrototype[details.Count];
+
+		int detailIndex = 0;
+
+		foreach (Detail d in details)
+		{
+			newDetailPrototypes[detailIndex] = new DetailPrototype();
+			newDetailPrototypes[detailIndex].prototype = d.prototype;
+			newDetailPrototypes[detailIndex].prototypeTexture = d.prototypeTexture;
+			newDetailPrototypes[detailIndex].healthyColor = Color.white;
+
+			if (newDetailPrototypes[detailIndex].prototype)
+			{
+				newDetailPrototypes[detailIndex].usePrototypeMesh = true;
+				newDetailPrototypes[detailIndex].renderMode = DetailRenderMode.VertexLit;
+			}
+			else
+			{
+				newDetailPrototypes[detailIndex].usePrototypeMesh = false;
+				newDetailPrototypes[detailIndex].renderMode = DetailRenderMode.GrassBillboard;
+			}
+
+			detailIndex++;
+
+		}
+		terrainData.detailPrototypes = newDetailPrototypes;
+
+		for (int i = 0; i < terrainData.detailPrototypes.Length; i++)
+		{
+			int[,] detailMap = new int[terrainData.detailWidth, terrainData.detailHeight];
+
+			for (int x = 0; x < terrainData.detailWidth; x += detailSpacing)
+			{
+				for (int y = 0; y < terrainData.detailHeight; y += detailSpacing)
+				{
+					if (UnityEngine.Random.Range(0.0f, 1.0f) > details[i].density) continue;
+
+					// x and y are swapped in detail map (rotated at 90deg to terrain data). not sure why
+					detailMap[y, x] = 1;
+				}
+			}
+			terrainData.SetDetailLayer(0, 0, i, detailMap);
+		}
+	}
+
 
 	void NormalizeVector(float[] vector)
 	{

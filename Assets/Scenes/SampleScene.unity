@@ -399,5 +399,28 @@ MonoBehaviour:
     remove: 1
   maxTrees: 3306
   treeSpacing: 6
+  details:
+  - prototype: {fileID: 100000, guid: 8e41f14c6552d48e6a7992aaecc808e4, type: 3}
+    prototypeTexture: {fileID: 0}
+    minHeight: 0.1
+    maxHeight: 0.2
+    minSlope: 0
+    maxSlope: 1
+    overlap: 0.01
+    feather: 0.05
+    density: 0.1
+    remove: 0
+  - prototype: {fileID: 0}
+    prototypeTexture: {fileID: 2800000, guid: a65d3373cd11cd72a00009188f962b59, type: 3}
+    minHeight: 0.1
+    maxHeight: 0.2
+    minSlope: 0
+    maxSlope: 1
+    overlap: 0.01
+    feather: 0.05
+    density: 0.1
+    remove: 0
+  maxDetails: 5000
+  detailSpacing: 5
   terrain: {fileID: 995469955}
   terrainData: {fileID: 15600000, guid: 4187ec83035934bb48fc2c531e497b60, type: 2}
