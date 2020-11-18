@@ -97,7 +97,15 @@ public class CustomTerrain : MonoBehaviour {
 		public float maxHeight = 0.2f;
 		public float minSlope = 0;
 		public float maxSlope = 90;
+		public float minScale = 0.5f;
+		public float maxScale = 1.0f;
 		public float randomOffset = 5.0f;
+		public Color color1 = Color.white;
+		public Color color2 = Color.white;
+		public Color lightmapColor = Color.white;
+		public float minRotation = 0;
+		public float maxRotation = 360f;
+		public float density = 0.5f;
 		public bool remove = false;
 	}
 
@@ -551,15 +559,24 @@ public class CustomTerrain : MonoBehaviour {
 			{
 				for (int treeProtoIndex = 0; treeProtoIndex < terrainData.treePrototypes.Length; treeProtoIndex++)
 				{
-					// todo: clean up syntax with {}?
-					// float thisHeight = terrainData.GetHeight(x, z) / terrainData.size.y;
-					TreeInstance instance = new TreeInstance();
 					Vegetation tree = vegetation[treeProtoIndex];
 
-					float thisHeight = terrainData.GetHeight(x, z) / terrainData.size.y;
+					// skip all trees for this position if we are above desired density
+					// this will be true more often the lower the density value is
+					if (UnityEngine.Random.Range(0.0f, 1.0f) > tree.density) break;
 
-					// skip if we don't want this tree at this height 
-					if (thisHeight > tree.maxHeight || thisHeight < tree.minHeight) continue;
+					TreeInstance instance = new TreeInstance();
+
+					float thisHeight = terrainData.GetHeight(x, z) / terrainData.size.y;
+					float thisSteepness = terrainData.GetSteepness(x / (float)terrainData.size.x, z / (float)terrainData.size.z);
+
+					// if we don't want this tree at this height or slope, then skip adding it
+					if (
+						thisHeight > tree.maxHeight ||
+						thisHeight < tree.minHeight ||
+						thisSteepness > tree.maxSlope ||
+						thisSteepness < tree.minSlope
+					) continue;
 			
 					instance.position = new Vector3(
 						(x + UnityEngine.Random.Range(-tree.randomOffset, tree.randomOffset))/ terrainData.size.x,
@@ -595,13 +612,21 @@ public class CustomTerrain : MonoBehaviour {
 						instance.position = new Vector3(instance.position.x, treeHeight, instance.position.z);
 					}
 				
+					// adjust position to account for resolution of alphamap
+					instance.position = new Vector3(
+						instance.position.x * terrainData.size.x / terrainData.alphamapWidth,
+                        instance.position.y,
+                        instance.position.z * terrainData.size.z / terrainData.alphamapHeight
+					);
 
-					instance.rotation = UnityEngine.Random.Range(0, 360);
+					instance.rotation = UnityEngine.Random.Range(tree.minRotation, tree.maxRotation);
 					instance.prototypeIndex = treeProtoIndex;
-					instance.color = Color.white;
-					instance.lightmapColor = Color.white;
-					instance.heightScale = 0.95f;
-					instance.widthScale = 0.95f;
+					instance.color = Color.Lerp(tree.color1, tree.color2, UnityEngine.Random.Range(0.0f, 1.0f));
+					instance.lightmapColor = tree.lightmapColor;
+
+					float scale = UnityEngine.Random.Range(-tree.minScale, tree.maxScale);
+					instance.heightScale = scale;
+					instance.widthScale = scale;
 
 					allVegetation.Add(instance);
 

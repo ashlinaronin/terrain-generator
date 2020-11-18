@@ -382,21 +382,22 @@ MonoBehaviour:
     splatNoiseScaler: 0.1
     remove: 0
   vegetation:
-  - mesh: {fileID: 100000, guid: 02e48269f8d554fbca75435761452392, type: 3}
-    minHeight: 0.1
-    maxHeight: 0.2
-    minSlope: 0
-    maxSlope: 90
-    randomOffset: 5
-    remove: 0
-  - mesh: {fileID: 100000, guid: 8c7d35afbd119bca11002b7b44295342, type: 3}
+  - mesh: {fileID: 100000, guid: 25fa881dbd110e38a00062d88f962b59, type: 3}
     minHeight: 0
-    maxHeight: 0.1
+    maxHeight: 1
     minSlope: 0
-    maxSlope: 90
+    maxSlope: 45
+    minScale: 0.5
+    maxScale: 1
     randomOffset: 5
-    remove: 0
+    color1: {r: 0.97254896, g: 1, b: 0, a: 1}
+    color2: {r: 0.94509804, g: 0, b: 0.34340805, a: 1}
+    lightmapColor: {r: 1, g: 1, b: 1, a: 1}
+    minRotation: 0
+    maxRotation: 360
+    density: 0.5
+    remove: 1
   maxTrees: 3306
-  treeSpacing: 12
+  treeSpacing: 6
   terrain: {fileID: 995469955}
   terrainData: {fileID: 15600000, guid: 4187ec83035934bb48fc2c531e497b60, type: 2}
