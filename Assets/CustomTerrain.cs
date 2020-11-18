@@ -715,6 +715,8 @@ public class CustomTerrain : MonoBehaviour {
 		}
 		terrainData.detailPrototypes = newDetailPrototypes;
 
+		float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
+
 		for (int i = 0; i < terrainData.detailPrototypes.Length; i++)
 		{
 			int[,] detailMap = new int[terrainData.detailWidth, terrainData.detailHeight];
@@ -725,8 +727,32 @@ public class CustomTerrain : MonoBehaviour {
 				{
 					if (UnityEngine.Random.Range(0.0f, 1.0f) > details[i].density) continue;
 
-					// x and y are swapped in detail map (rotated at 90deg to terrain data). not sure why
-					detailMap[y, x] = 1;
+					int xHM = (int)(x/(float)terrainData.detailWidth * terrainData.heightmapWidth);
+					int yHM = (int)(y/(float)terrainData.detailHeight * terrainData.heightmapHeight);
+
+					float thisNoise = Utils.Map(
+						Mathf.PerlinNoise(x * details[i].feather, y * details[i].feather),
+						0,
+						1,
+						0.5f,
+						1
+					);
+
+					float thisHeightStart = details[i].minHeight * thisNoise - details[i].overlap * thisNoise;
+					float thisHeightEnd = details[i].maxHeight * thisNoise + details[i].overlap * thisNoise;
+
+					float thisHeight = heightMap[yHM, xHM]; // detail map flips x and y
+
+					// remember-- terrainData heights are in y, so detail's (flipped) y,x = terrainData's x,z :0
+					float steepness = terrainData.GetSteepness(xHM / (float)terrainData.size.x, yHM / (float)terrainData.size.z);
+
+					bool withinHeightRange = thisHeight >= thisHeightStart && thisHeight <= thisHeightEnd;
+					bool withinSlopeRange = steepness >= details[i].minSlope && steepness <= details[i].maxSlope;
+					if (withinHeightRange && withinSlopeRange)
+					{
+						// x and y are swapped in detail map (rotated at 90deg to terrain data)
+						detailMap[y, x] = 1;
+					}
 				}
 			}
 			terrainData.SetDetailLayer(0, 0, i, detailMap);

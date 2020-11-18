@@ -283,6 +283,11 @@ public class CustomTerrainEditor : Editor {
 			EditorGUILayout.IntSlider(detailSpacing, 1, 20, new GUIContent("Detail Spacing"));
 			detailsTable = GUITableLayout.DrawTable(detailsTable, details);
 
+			// sync unity's detail distance with max details value from slider
+			// so we can see all the details while developing. may want to dial back if framerate
+			// is affected
+			terrain.GetComponent<Terrain>().detailObjectDistance = maxDetails.intValue;
+
 			GUILayout.Space(20);
 
 			EditorGUILayout.BeginHorizontal();
