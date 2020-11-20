@@ -130,6 +130,12 @@ public class CustomTerrain : MonoBehaviour {
 		public float overlap = 0.01f;
 		public float feather = 0.05f;
 		public float density = 0.5f;
+		public float bendFactor = 0.5f;
+		public Color dryColor = Color.white;
+		public Color healthyColor = Color.white;
+		public Vector2 heightRange = new Vector2(1, 1);
+		public Vector2 widthRange = new Vector2(1, 1);
+		public float noiseSpread = 0.5f;
 		public bool remove = false;
 	}
 
@@ -697,7 +703,13 @@ public class CustomTerrain : MonoBehaviour {
 			newDetailPrototypes[detailIndex] = new DetailPrototype();
 			newDetailPrototypes[detailIndex].prototype = d.prototype;
 			newDetailPrototypes[detailIndex].prototypeTexture = d.prototypeTexture;
-			newDetailPrototypes[detailIndex].healthyColor = Color.white;
+			newDetailPrototypes[detailIndex].dryColor = d.dryColor;
+			newDetailPrototypes[detailIndex].healthyColor = d.healthyColor;
+			newDetailPrototypes[detailIndex].minHeight = d.heightRange[0];
+			newDetailPrototypes[detailIndex].maxHeight = d.heightRange[1];
+			newDetailPrototypes[detailIndex].minWidth = d.widthRange[0];
+			newDetailPrototypes[detailIndex].maxWidth = d.widthRange[1];
+			newDetailPrototypes[detailIndex].noiseSpread = d.noiseSpread;
 
 			if (newDetailPrototypes[detailIndex].prototype)
 			{
