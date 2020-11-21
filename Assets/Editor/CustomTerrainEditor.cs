@@ -46,6 +46,9 @@ public class CustomTerrainEditor : Editor {
 	SerializedProperty maxDetails;
 	SerializedProperty detailSpacing;
 
+	SerializedProperty waterHeight;
+	SerializedProperty waterGameObject;
+
 
 	Texture2D heightMapTexture;
 
@@ -61,6 +64,7 @@ public class CustomTerrainEditor : Editor {
 	bool showSplatMaps = false;
 	bool showVegetation = false;
 	bool showDetails = false;
+	bool showWater = false;
 	bool showHeightMap = false;
 
 	void OnEnable()
@@ -102,6 +106,9 @@ public class CustomTerrainEditor : Editor {
 		details = serializedObject.FindProperty("details");
 		maxDetails = serializedObject.FindProperty("maxDetails");
 		detailSpacing = serializedObject.FindProperty("detailSpacing");
+		waterHeight = serializedObject.FindProperty("waterHeight");
+		waterGameObject = serializedObject.FindProperty("waterGameObject");
+
 
 		CustomTerrain terrain = (CustomTerrain)target;
 
@@ -303,6 +310,17 @@ public class CustomTerrainEditor : Editor {
 			if (GUILayout.Button("Apply Details"))
 			{
 				terrain.ApplyDetails();
+			}
+		}
+
+		showWater = EditorGUILayout.Foldout(showWater, "Water");
+		if (showWater)
+		{
+			EditorGUILayout.Slider(waterHeight, 0, 1, new GUIContent("Water Height"));
+			EditorGUILayout.PropertyField(waterGameObject);
+			if (GUILayout.Button("Apply Water"))
+			{
+				terrain.ApplyWater();
 			}
 		}
 

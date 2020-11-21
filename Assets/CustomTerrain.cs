@@ -148,6 +148,10 @@ public class CustomTerrain : MonoBehaviour {
 	public int detailSpacing = 5;
 
 
+	// WATER ------------------------------------------------
+	public float waterHeight = 0.5f;
+	public GameObject waterGameObject;
+
 
 	public Terrain terrain;
 	public TerrainData terrainData;
@@ -771,6 +775,22 @@ public class CustomTerrain : MonoBehaviour {
 		}
 	}
 
+	public void ApplyWater()
+	{
+		GameObject water = GameObject.Find("water");
+		if (!water)
+		{
+			// instantiate water at terrain position and rotation
+			water = Instantiate(waterGameObject, this.transform.position, this.transform.rotation);
+			water.name = "water";
+		}
+
+		// then re-position and scale based on terrain size
+		water.transform.position =
+			this.transform.position +
+			new Vector3(terrainData.size.x / 2, waterHeight * terrainData.size.y, terrainData.size.z / 2);
+		water.transform.localScale = new Vector3(terrainData.size.x, 1, terrainData.size.z);
+	}
 
 	void NormalizeVector(float[] vector)
 	{
