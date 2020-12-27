@@ -151,6 +151,7 @@ public class CustomTerrain : MonoBehaviour {
 	// WATER ------------------------------------------------
 	public float waterHeight = 0.5f;
 	public GameObject waterGameObject;
+	public Material shorelineMaterial;
 
 
 	public Terrain terrain;
@@ -790,6 +791,51 @@ public class CustomTerrain : MonoBehaviour {
 			this.transform.position +
 			new Vector3(terrainData.size.x / 2, waterHeight * terrainData.size.y, terrainData.size.z / 2);
 		water.transform.localScale = new Vector3(terrainData.size.x, 1, terrainData.size.z);
+	}
+
+	public void DrawShoreline()
+	{
+		float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
+
+		int quadCount = 0;
+		GameObject quads = new GameObject("QUADS");
+
+		for (int x = 0; x < terrainData.heightmapWidth; x++)
+		{
+			for (int y = 0; y < terrainData.heightmapHeight; y++)
+			{
+				// find spot on shore
+				Vector2 thisLocation = new Vector2(x, y);
+				List<Vector2> neighbors = GetNeighbors(thisLocation, terrainData.heightmapWidth, terrainData.heightmapHeight);
+
+				foreach (Vector2 neighbor in neighbors)
+				{
+					if (heightMap[x, y] < waterHeight && heightMap[(int)neighbor.x, (int)neighbor.y] > waterHeight)
+					{
+						// if (quadCount > 1000)
+						// {
+						// 	continue;
+						// }
+
+						quadCount++;
+						// must be a position of the shore (if self and neighbor are above water level)
+						GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
+						go.transform.localScale *= 20.0f;
+						go.transform.position =
+							this.transform.position +
+							new Vector3(
+								y / (float)terrainData.heightmapHeight * terrainData.size.z,
+								waterHeight * terrainData.size.y,
+								x / (float)terrainData.heightmapWidth * terrainData.size.x
+							);
+
+						go.transform.Rotate(90, 0, 0);
+						go.tag = "Shore";
+						go.transform.parent = quads.transform;
+					}
+				}
+			}
+		}
 	}
 
 	void NormalizeVector(float[] vector)

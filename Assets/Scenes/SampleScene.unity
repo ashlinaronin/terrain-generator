@@ -554,5 +554,6 @@ MonoBehaviour:
   detailSpacing: 5
   waterHeight: 0.207
   waterGameObject: {fileID: 100000, guid: 780611a67e8e941a2b3aa96e5915a793, type: 2}
+  shorelineMaterial: {fileID: 2100000, guid: 8658be00eeae34a97b7ede41d936880b, type: 2}
   terrain: {fileID: 995469955}
   terrainData: {fileID: 15600000, guid: 4187ec83035934bb48fc2c531e497b60, type: 2}

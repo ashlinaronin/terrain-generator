@@ -48,6 +48,7 @@ public class CustomTerrainEditor : Editor {
 
 	SerializedProperty waterHeight;
 	SerializedProperty waterGameObject;
+	SerializedProperty shorelineMaterial;
 
 
 	Texture2D heightMapTexture;
@@ -108,7 +109,7 @@ public class CustomTerrainEditor : Editor {
 		detailSpacing = serializedObject.FindProperty("detailSpacing");
 		waterHeight = serializedObject.FindProperty("waterHeight");
 		waterGameObject = serializedObject.FindProperty("waterGameObject");
-
+		shorelineMaterial = serializedObject.FindProperty("shorelineMaterial");
 
 		CustomTerrain terrain = (CustomTerrain)target;
 
@@ -321,6 +322,12 @@ public class CustomTerrainEditor : Editor {
 			if (GUILayout.Button("Apply Water"))
 			{
 				terrain.ApplyWater();
+			}
+
+			EditorGUILayout.PropertyField(shorelineMaterial);
+			if (GUILayout.Button("Draw Shoreline"))
+			{
+				terrain.DrawShoreline();
 			}
 		}
 
