@@ -798,7 +798,7 @@ public class CustomTerrain : MonoBehaviour {
 		float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
 
 		int quadCount = 0;
-		GameObject quads = new GameObject("QUADS");
+		// GameObject quads = new GameObject("QUADS");
 
 		for (int x = 0; x < terrainData.heightmapWidth; x++)
 		{
@@ -829,13 +829,64 @@ public class CustomTerrain : MonoBehaviour {
 								x / (float)terrainData.heightmapWidth * terrainData.size.x
 							);
 
+						go.transform.LookAt(
+							new Vector3(
+								neighbor.y / (float)terrainData.heightmapHeight * terrainData.size.z,
+								waterHeight * terrainData.size.y,
+								neighbor.x / (float)terrainData.heightmapWidth * terrainData.size.x
+							)
+						);
 						go.transform.Rotate(90, 0, 0);
 						go.tag = "Shore";
-						go.transform.parent = quads.transform;
+						// go.transform.parent = quads.transform;
 					}
 				}
 			}
 		}
+
+		// todo: is there a more efficient way to do this? keep references when creating?
+		GameObject[] shoreQuads = GameObject.FindGameObjectsWithTag("Shore");
+		MeshFilter[] meshFilters = new MeshFilter[shoreQuads.Length];
+		for (int m = 0; m < shoreQuads.Length; m++)
+		{
+			meshFilters[m] = shoreQuads[m].GetComponent<MeshFilter>();
+		}
+		CombineInstance[] combine = new CombineInstance[shoreQuads.Length];
+
+		// todo: why isn't this a for loop?
+		int i = 0;
+		while (i < meshFilters.Length)
+		{
+			combine[i].mesh = meshFilters[i].sharedMesh;
+			combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
+			meshFilters[i].gameObject.SetActive(false);
+			i++;
+		}
+
+		GameObject currentShoreline = GameObject.Find("Shoreline");
+		if (currentShoreline)
+		{
+			DestroyImmediate(currentShoreline);
+		}
+		GameObject shoreline = new GameObject();
+		shoreline.name = "Shoreline";
+		shoreline.AddComponent<WaveAnimation>();
+		shoreline.transform.position = this.transform.position;
+		shoreline.transform.rotation = this.transform.rotation;
+		MeshFilter thisMF = shoreline.AddComponent<MeshFilter>();
+		thisMF.mesh = new Mesh();
+
+		// todo: dont we have a reference to thisMF above?
+		shoreline.GetComponent<MeshFilter>().sharedMesh.CombineMeshes(combine);
+
+		MeshRenderer shorelineRenderer = shoreline.AddComponent<MeshRenderer>();
+		shorelineRenderer.sharedMaterial = shorelineMaterial;
+
+		for (int shoreQuadIndex = 0; shoreQuadIndex < shoreQuads.Length; shoreQuadIndex++)
+		{
+			DestroyImmediate(shoreQuads[shoreQuadIndex]);
+		}
+
 	}
 
 	void NormalizeVector(float[] vector)
