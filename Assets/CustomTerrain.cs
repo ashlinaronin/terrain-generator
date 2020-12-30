@@ -952,9 +952,30 @@ public class CustomTerrain : MonoBehaviour {
 		terrainData.SetHeights(0, 0, heightMap);
 	}
 
-		void Tidal()
+	void Tidal()
 	{
+		float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
 
+		for (int x = 0; x < terrainData.heightmapWidth; x++)
+		{
+			for (int y = 0; y < terrainData.heightmapHeight; y++)
+			{
+				// find spot on shore
+				Vector2 thisLocation = new Vector2(x, y);
+				List<Vector2> neighbors = GetNeighbors(thisLocation, terrainData.heightmapWidth, terrainData.heightmapHeight);
+
+				foreach (Vector2 neighbor in neighbors)
+				{
+					if (heightMap[x, y] < waterHeight && heightMap[(int)neighbor.x, (int)neighbor.y] > waterHeight)
+					{
+						heightMap[x, y] = waterHeight;
+						heightMap[(int)neighbor.x, (int)neighbor.y] = waterHeight;
+					}
+				}
+			}
+		}
+
+		terrainData.SetHeights(0, 0, heightMap);
 	}
 
 	void River()
