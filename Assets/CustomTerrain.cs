@@ -155,7 +155,7 @@ public class CustomTerrain : MonoBehaviour {
 
 
 	// EROSION ------------------------------------------------
-	public enum ErosionType { Rain = 0, Thermal = 1, Tidal = 2, River = 3, Wind = 4 };
+	public enum ErosionType { Rain = 0, Thermal = 1, Tidal = 2, River = 3, Wind = 4, Canyon = 5 };
 	public ErosionType erosionType = ErosionType.Rain;
 	public float erosionStrength = 0.1f;
 	public float erosionAmount = 0.01f;
@@ -914,6 +914,7 @@ public class CustomTerrain : MonoBehaviour {
 		else if (erosionType == ErosionType.Tidal) Tidal();
 		else if (erosionType == ErosionType.River) River();
 		else if (erosionType == ErosionType.Wind) Wind();
+		else if (erosionType == ErosionType.Canyon) Canyon();
 
 		Smooth(erosionSmoothAmount);
 	}
@@ -1091,6 +1092,47 @@ public class CustomTerrain : MonoBehaviour {
 		}
 
 		terrainData.SetHeights(0, 0, heightMap);
+	}
+
+	float[,] tempHeightMap;
+	void Canyon()
+	{
+		float digDepth = 0.05f;
+		float bankSlope = 0.001f;
+		float maxDepth = 0;
+		tempHeightMap = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
+
+		int cx = 1;
+		int cy = UnityEngine.Random.Range(10, terrainData.heightmapHeight - 10);
+		while (
+			 cx > 0 && cx < terrainData.heightmapWidth &&
+			 cy >= 0 && cy < terrainData.heightmapHeight
+		)
+		{
+			CanyonCrawler(cx, cy, tempHeightMap[cx, cy] - digDepth, bankSlope, maxDepth);
+			cx = cx + UnityEngine.Random.Range(1, 3); // one or two; range doesn't include last int
+			cy = cy + UnityEngine.Random.Range(-2, 3);
+		}
+		terrainData.SetHeights(0, 0, tempHeightMap);
+	}
+
+	void CanyonCrawler(int x, int y, float height, float slope, float maxDepth)
+	{
+		if (x < 0 || x >= terrainData.heightmapWidth) return; // off x range of map
+		if (y < 0 || y >= terrainData.heightmapHeight) return; // off y range of map
+		if (height <= maxDepth) return; // if hit lowest level
+		if (tempHeightMap[x, y] <= height) return; // if run into lower elevation (already dug, so we don't need to dig more)
+	
+		tempHeightMap[x, y] = height;
+
+		// all neighboring pixels
+		// todo: hmm... why not all the neighbors? any point should have 8 neighbors, right?
+		CanyonCrawler(x + 1, y, height + UnityEngine.Random.Range(slope, slope + 0.01f), slope, maxDepth);
+		CanyonCrawler(x - 1, y, height + UnityEngine.Random.Range(slope, slope + 0.01f), slope, maxDepth);
+		CanyonCrawler(x + 1, y + 1, height + UnityEngine.Random.Range(slope, slope + 0.01f), slope, maxDepth);
+		CanyonCrawler(x - 1, y + 1, height + UnityEngine.Random.Range(slope, slope + 0.01f), slope, maxDepth);
+		CanyonCrawler(x, y - 1, height + UnityEngine.Random.Range(slope, slope + 0.01f), slope, maxDepth);
+		CanyonCrawler(x, y + 1, height + UnityEngine.Random.Range(slope, slope + 0.01f), slope, maxDepth);
 	}
 
 
