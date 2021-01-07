@@ -1044,7 +1044,37 @@ public class CustomTerrain : MonoBehaviour {
 
 	void Wind()
 	{
+		int width = terrainData.heightmapWidth;
+		int height = terrainData.heightmapHeight;
+		float[,] heightMap = terrainData.GetHeights(0, 0, width, height);
+		int neighborOffset = 5;
+		float dirtRemovalAmount = 0.001f;
+		float perlinScale = 0.06f;
+		int perlinMultiplier = 20;
 
+		// todo: use erosionAmount or erosionStrength somewhere?
+		for (int y = 0; y <= height; y += (neighborOffset * 2))
+		{
+			for (int x = 0; x <= width; x += 1)
+			{
+				float depositNoise = (float)Mathf.PerlinNoise(x * perlinScale, y * perlinScale) * perlinMultiplier * erosionStrength;
+
+				// neighbor is a point in front of us
+				int nx = x;
+				int digY = (int)y + (int)depositNoise;
+				int ny = y + neighborOffset + (int)depositNoise;
+
+				// check that neighbor is within the heightMap
+				// if so, take a very small amount of dirt away from dig position and leave it at deposit position
+				if (!(nx < 0 || nx > (width - 1) || ny < 0 || ny > (height - 1)))
+				{
+					heightMap[x, digY] -= dirtRemovalAmount;
+					heightMap[nx, ny] += dirtRemovalAmount;
+				}
+			}
+		}
+
+		terrainData.SetHeights(0, 0, heightMap);
 	}
 
 
