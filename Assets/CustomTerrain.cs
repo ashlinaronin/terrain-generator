@@ -1051,11 +1051,15 @@ public class CustomTerrain : MonoBehaviour {
 		float dirtRemovalAmount = 0.001f;
 		float perlinScale = 0.06f;
 		int perlinMultiplier = 20;
+		float windDirection = 30; // degrees
+		float sinAngle = -Mathf.Sin(Mathf.Deg2Rad * windDirection);
+		float cosAngle = Mathf.Cos(Mathf.Deg2Rad * windDirection);
 
 		// todo: use erosionAmount or erosionStrength somewhere?
-		for (int y = 0; y <= height; y += (neighborOffset * 2))
+		// todo slightly more efficient use 1.2 or something lower than 2
+		for (int y = -(height - 1)*2; y <= height*2; y += (neighborOffset * 2))
 		{
-			for (int x = 0; x <= width; x += 1)
+			for (int x = -(width - 1)*2; x <= width*2; x += 1)
 			{
 				float depositNoise = (float)Mathf.PerlinNoise(x * perlinScale, y * perlinScale) * perlinMultiplier * erosionStrength;
 
@@ -1064,12 +1068,24 @@ public class CustomTerrain : MonoBehaviour {
 				int digY = (int)y + (int)depositNoise;
 				int ny = y + neighborOffset + (int)depositNoise;
 
-				// check that neighbor is within the heightMap
-				// if so, take a very small amount of dirt away from dig position and leave it at deposit position
-				if (!(nx < 0 || nx > (width - 1) || ny < 0 || ny > (height - 1)))
+				Vector2 digCoords = new Vector2(x * cosAngle - digY * sinAngle, digY * cosAngle + x * sinAngle);
+				Vector2 pileCoords = new Vector2(nx * cosAngle - ny * sinAngle, ny * cosAngle + nx * sinAngle);
+
+				// make sure neither pile nor dig coords are off the map
+				// todo: make a helper function for this
+				if (!(
+					pileCoords.x < 0 ||
+					pileCoords.x > (width - 1) ||
+					pileCoords.y < 0 ||
+					pileCoords.y > (height - 1) ||
+					digCoords.x < 0 ||
+					digCoords.x > (width - 1) ||
+					digCoords.y < 0 ||
+					digCoords.y > (height - 1)
+					))
 				{
-					heightMap[x, digY] -= dirtRemovalAmount;
-					heightMap[nx, ny] += dirtRemovalAmount;
+					heightMap[(int)digCoords.x, (int)digCoords.y] -= dirtRemovalAmount;
+					heightMap[(int)pileCoords.x, (int)pileCoords.y] += dirtRemovalAmount;
 				}
 			}
 		}
