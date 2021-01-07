@@ -159,7 +159,7 @@ public class CustomTerrain : MonoBehaviour {
 	public ErosionType erosionType = ErosionType.Rain;
 	public float erosionStrength = 0.1f;
 	public float erosionAmount = 0.01f;
-	public int springsPerRiver = 5;
+	public int springsPerDroplet = 5;
 	public float solubility = 0.01f;
 	public int droplets = 10;
 	public int erosionSmoothAmount = 5;
@@ -203,14 +203,21 @@ public class CustomTerrain : MonoBehaviour {
 		return neighbors;
 	}
 
-	public void Smooth()
+	// separating so we can call this from the editor, and then call with different value
+	// from erosion methods
+	public void SmoothStandalone()
+	{
+		Smooth(smoothAmount);
+	}
+
+	public void Smooth(int smoothIterations)
 	{
 		// don't want to ever reset when smoothing, since we're always smoothing what was there before
 		float [,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
 		float smoothProgress = 0;
 		EditorUtility.DisplayProgressBar("Smoothing Terrain", "Progress", smoothProgress);
 
-		for (int smoothIteration = 0; smoothIteration < smoothAmount; smoothIteration++)
+		for (int smoothIteration = 0; smoothIteration < smoothIterations; smoothIteration++)
 		{
 			for (int x = 0; x < terrainData.heightmapWidth; x++)
 			{
@@ -228,7 +235,7 @@ public class CustomTerrain : MonoBehaviour {
 				}
 			}
 			smoothProgress++;
-			EditorUtility.DisplayProgressBar("Smoothing Terrain", "Progress", smoothProgress / smoothAmount);
+			EditorUtility.DisplayProgressBar("Smoothing Terrain", "Progress", smoothProgress / smoothIterations);
 		}
 
 		terrainData.SetHeights(0, 0, heightMap);
@@ -908,8 +915,7 @@ public class CustomTerrain : MonoBehaviour {
 		else if (erosionType == ErosionType.River) River();
 		else if (erosionType == ErosionType.Wind) Wind();
 
-		// smoothAmount = erosionSmoothAmount;
-		// Smooth();
+		Smooth(erosionSmoothAmount);
 	}
 
 	void Rain()
@@ -980,7 +986,60 @@ public class CustomTerrain : MonoBehaviour {
 
 	void River()
 	{
+		float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapWidth, terrainData.heightmapHeight);
+		float[,] erosionMap = new float[terrainData.heightmapWidth, terrainData.heightmapHeight];
 
+		for (int i = 0; i < droplets; i++)
+		{
+			Vector2 dropletPosition = new Vector2(
+				UnityEngine.Random.Range(0, terrainData.heightmapWidth),
+				UnityEngine.Random.Range(0, terrainData.heightmapHeight)
+			);
+
+			erosionMap[(int)dropletPosition.x, (int)dropletPosition.y] = erosionStrength;
+
+			for (int j = 0; j < springsPerDroplet; j++)
+			{
+				erosionMap = RunRiver(dropletPosition, heightMap, erosionMap, terrainData.heightmapWidth, terrainData.heightmapHeight);
+			}
+
+			for (int x = 0; x < terrainData.heightmapWidth; x++)
+			{
+				for (int y = 0; y < terrainData.heightmapHeight; y++)
+				{
+					heightMap[x, y] -= erosionMap[x, y];
+				}
+			}
+
+		}
+
+		terrainData.SetHeights(0, 0, heightMap);
+	}
+
+	float[,] RunRiver(Vector3 dropletPosition, float[,] heightMap, float[,] erosionMap, int width, int height)
+	{
+		while (erosionMap[(int)dropletPosition.x, (int)dropletPosition.y] > 0)
+		{
+			List<Vector2> neighbors = GetNeighbors(dropletPosition, width, height);
+			neighbors.Shuffle(); // if you don't shuffle, every time you'll get the same low neighbors in the same order
+			bool foundLower = false;
+			foreach (Vector2 neighbor in neighbors)
+			{
+				if (heightMap[(int)neighbor.x, (int)neighbor.y] < heightMap[(int)dropletPosition.x, (int)dropletPosition.y])
+				{
+					erosionMap[(int)neighbor.x, (int)neighbor.y] = erosionMap[(int)dropletPosition.x, (int)dropletPosition.y] - solubility;
+					dropletPosition = neighbor;
+					foundLower = true;
+					break;
+				}
+			}
+			if (!foundLower)
+			{
+				erosionMap[(int)dropletPosition.x, (int)dropletPosition.y] -= solubility;
+			}
+		}
+
+		return erosionMap;
 	}
 
 	void Wind()

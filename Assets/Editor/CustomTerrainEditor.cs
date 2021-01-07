@@ -53,7 +53,7 @@ public class CustomTerrainEditor : Editor {
 	SerializedProperty erosionType;
 	SerializedProperty erosionStrength;
 	SerializedProperty erosionAmount;
-	SerializedProperty springsPerRiver;
+	SerializedProperty springsPerDroplet;
 	SerializedProperty solubility;
 	SerializedProperty droplets;
 	SerializedProperty erosionSmoothAmount;
@@ -122,7 +122,7 @@ public class CustomTerrainEditor : Editor {
 		erosionType = serializedObject.FindProperty("erosionType");
 		erosionStrength = serializedObject.FindProperty("erosionStrength");
 		erosionAmount = serializedObject.FindProperty("erosionAmount");
-		springsPerRiver = serializedObject.FindProperty("springsPerRiver");
+		springsPerDroplet = serializedObject.FindProperty("springsPerDroplet");
 		solubility = serializedObject.FindProperty("solubility");
 		droplets = serializedObject.FindProperty("droplets");
 		erosionSmoothAmount = serializedObject.FindProperty("erosionSmoothAmount");
@@ -356,8 +356,8 @@ public class CustomTerrainEditor : Editor {
 			EditorGUILayout.Slider(erosionAmount, 0, 1, new GUIContent("Erosion Amount"));
 			EditorGUILayout.IntSlider(droplets, 0, 500, new GUIContent("Droplets"));
 			EditorGUILayout.Slider(solubility, 0.001f, 1, new GUIContent("Solubility"));
-			EditorGUILayout.IntSlider(springsPerRiver, 0, 20, new GUIContent("Springs Per River"));
-			EditorGUILayout.IntSlider(smoothAmount, 0, 10, new GUIContent("Smooth Amount"));
+			EditorGUILayout.IntSlider(springsPerDroplet, 0, 20, new GUIContent("Springs Per River"));
+			EditorGUILayout.IntSlider(erosionSmoothAmount, 0, 10, new GUIContent("Smooth Amount"));
 
 			if (GUILayout.Button("Erode"))
 			{
@@ -371,7 +371,7 @@ public class CustomTerrainEditor : Editor {
 			EditorGUILayout.IntSlider(smoothAmount, 1, 10, new GUIContent("Smooth Amount"));
 			if (GUILayout.Button("Smooth"))
 			{
-				terrain.Smooth();
+				terrain.SmoothStandalone();
 			}
 		}
 
