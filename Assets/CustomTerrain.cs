@@ -1177,8 +1177,14 @@ public class CustomTerrain : MonoBehaviour {
 			cloudGO.transform.position = cloudManager.transform.position;
 			cloudGO.transform.parent = cloudManager.transform;
 			cloudGO.transform.localScale = new Vector3(1, 1, 1);
-			
+
 			CloudController cc = cloudGO.AddComponent<CloudController>();
+			cc.lining = cloudLiningColor;
+			cc.color = cloudColor;
+			cc.numberOfParticles = particlesPerCloud;
+			cc.minSpeed = cloudMinSpeed;
+			cc.maxSpeed = cloudMaxSpeed;
+			cc.distance = cloudDistanceTraveled;
 
 			ParticleSystem cloudSystem = cloudGO.AddComponent<ParticleSystem>();
 			Renderer cloudRenderer = cloudGO.GetComponent<Renderer>();
