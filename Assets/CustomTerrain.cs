@@ -170,7 +170,8 @@ public class CustomTerrain : MonoBehaviour {
 	public int numberOfClouds = 1;
 	public int particlesPerCloud = 50;
 	public float cloudParticleSize = 5.0f;
-	public Vector3 cloudSize = new Vector3(1, 1, 1);
+	public Vector3 cloudMinSize = new Vector3(1, 1, 1);
+	public Vector3 cloudMaxSize = new Vector3(1, 1, 1);
 	public Material cloudMaterial;
 	public Material cloudShadowMaterial;
 	public Color cloudColor = Color.white;
@@ -1206,7 +1207,11 @@ public class CustomTerrain : MonoBehaviour {
 
 			ParticleSystem.ShapeModule shape = cloudSystem.shape;
 			shape.shapeType = ParticleSystemShapeType.Sphere;
-			shape.scale = new Vector3(cloudSize.x, cloudSize.y, cloudSize.z);
+			shape.scale = new Vector3(
+				UnityEngine.Random.Range(cloudMinSize.x, cloudMaxSize.x),
+				UnityEngine.Random.Range(cloudMinSize.y, cloudMaxSize.y),
+				UnityEngine.Random.Range(cloudMinSize.z, cloudMaxSize.z)
+			);
 		}
 	}
 
