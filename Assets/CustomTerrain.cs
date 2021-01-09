@@ -907,6 +907,8 @@ public class CustomTerrain : MonoBehaviour {
 		shoreline.AddComponent<WaveAnimation>();
 		shoreline.transform.position = this.transform.position;
 		shoreline.transform.rotation = this.transform.rotation;
+		shoreline.layer = LayerMask.NameToLayer("Water");
+
 		MeshFilter thisMF = shoreline.AddComponent<MeshFilter>();
 		thisMF.mesh = new Mesh();
 
@@ -1173,6 +1175,7 @@ public class CustomTerrain : MonoBehaviour {
 			GameObject cloudGO = new GameObject();
 			cloudGO.name = "Cloud" + i;
 			cloudGO.tag = "Cloud";
+			cloudGO.layer = LayerMask.NameToLayer("Sky");
 
 			cloudGO.transform.rotation = cloudManager.transform.rotation;
 			cloudGO.transform.position = cloudManager.transform.position;
@@ -1192,6 +1195,27 @@ public class CustomTerrain : MonoBehaviour {
 			cloudRenderer.material = cloudMaterial;
 			cloudRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 			cloudRenderer.receiveShadows = false;
+
+			// apply shadow approx half the time, to avoid performance hit and overly dark shadows
+			if (UnityEngine.Random.Range(0, 10) < 5)
+			{
+				GameObject cloudProjector = new GameObject();
+				cloudProjector.name = "Shadow";
+				cloudProjector.transform.position = cloudGO.transform.position;
+				cloudProjector.transform.forward = Vector3.down;
+				cloudProjector.transform.parent = cloudGO.transform;
+
+				Projector cp = cloudProjector.AddComponent<Projector>();
+				cp.material = cloudShadowMaterial;
+				cp.farClipPlane = terrainData.size.y; // TODO: might need to adjust based on height of clouds
+				int skyLayerMask = 1 << LayerMask.NameToLayer("Sky");
+				int waterLayerMask = 1 << LayerMask.NameToLayer("Water");
+				cp.ignoreLayers = skyLayerMask | waterLayerMask;
+				cp.fieldOfView = 20.0f;
+			}
+
+	
+
 			ParticleSystem.MainModule main = cloudSystem.main;
 			main.loop = false;
 			main.startLifetime = Mathf.Infinity;
@@ -1281,6 +1305,7 @@ public class CustomTerrain : MonoBehaviour {
 		tagManager.ApplyModifiedProperties();
 
 		SerializedProperty layerProp = tagManager.FindProperty("layers");
+		AddTag(layerProp, "Sky", TagType.Layer);
 		terrainLayer = AddTag(layerProp, "Terrain", TagType.Layer);
 		tagManager.ApplyModifiedProperties();
 
